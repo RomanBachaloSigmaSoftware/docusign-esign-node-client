@@ -63,402 +63,410 @@ describe('SDK Unit Tests With Callbacks (Sigma):', function (done) {
     });
   });
   
-  it('Get envelope by id', function(done) {
-    var fileBytes = null;
-    try {
-      // read file from a local directory
-      fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
-    } catch (ex) {
-      // handle error
-      console.log('Exception: ' + ex);
-    }
-
-    // create an envelope to be signed
-    var envDef = new docusign.EnvelopeDefinition();
-    envDef.emailSubject = 'Please Sign my Node SDK Envelope';
-    envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
-
-    // add a document to the envelope
-    var doc = new docusign.Document();
-    var base64Doc = Buffer.from(fileBytes).toString('base64');
-    doc.documentBase64 = base64Doc;
-    doc.name = 'TestFile.pdf';
-    doc.documentId = '1';
-
-    var docs = [];
-    docs.push(doc);
-    envDef.documents = docs;
-
-    // Add a recipient to sign the document
-    var signer = new docusign.Signer();
-    signer.email = userName;
-    signer.name = 'Pat Developer';
-    signer.recipientId = '1';
-
-    // create a signHere tab somewhere on the document for the signer to sign
-    // default unit of measurement is pixels, can be mms, cms, inches also
-    var signHere = new docusign.SignHere();
-    signHere.documentId = '1';
-    signHere.pageNumber = '1';
-    signHere.recipientId = '1';
-    signHere.xPosition = '100';
-    signHere.yPosition = '100';
-
-    // can have multiple tabs, so need to add to envelope as a single element list
-    var signHereTabs = [];
-    signHereTabs.push(signHere);
-    var tabs = new docusign.Tabs();
-    tabs.signHereTabs = signHereTabs;
-    signer.tabs = tabs;
-
-    // Above causes issue
-    envDef.recipients = new docusign.Recipients();
-    envDef.recipients.signers = [];
-    envDef.recipients.signers.push(signer);
-
-    // send the envelope (otherwise it will be "created" in the Draft folder
-    envDef.status = 'sent';
-
-    var envelopesApi = new docusign.EnvelopesApi(apiClient);
-    
-    var getEnvelopeCallback = function(error, envelope, _response) {
-      if (error) {
-        return done(error);
+  describe('EnvelopesApi tests:', function () {
+    it('Get envelope by id', function(done) {
+      var fileBytes = null;
+      try {
+        // read file from a local directory
+        fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
+      } catch (ex) {
+        // handle error
+        console.log('Exception: ' + ex);
       }
 
-      assert.notStrictEqual(envelope, undefined);
-      done();
-    }
+      // create an envelope to be signed
+      var envDef = new docusign.EnvelopeDefinition();
+      envDef.emailSubject = 'Please Sign my Node SDK Envelope';
+      envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
-    var createEnvelopeCallback = function(error, envelopeSummary, _response) {
-      if (error) {
-        return done(error);
-      }
+      // add a document to the envelope
+      var doc = new docusign.Document();
+      var base64Doc = Buffer.from(fileBytes).toString('base64');
+      doc.documentBase64 = base64Doc;
+      doc.name = 'TestFile.pdf';
+      doc.documentId = '1';
 
-      assert.notStrictEqual(envelopeSummary, undefined);
-      envelopeId = envelopeSummary.envelopeId
+      var docs = [];
+      docs.push(doc);
+      envDef.documents = docs;
 
-      envelopesApi.getEnvelope(accountId, envelopeSummary.envelopeId, getEnvelopeCallback);
-    }
+      // Add a recipient to sign the document
+      var signer = new docusign.Signer();
+      signer.email = userName;
+      signer.name = 'Pat Developer';
+      signer.recipientId = '1';
 
-    envelopesApi.createEnvelope(accountId, { envelopeDefinition: envDef }, createEnvelopeCallback);
-  })
+      // create a signHere tab somewhere on the document for the signer to sign
+      // default unit of measurement is pixels, can be mms, cms, inches also
+      var signHere = new docusign.SignHere();
+      signHere.documentId = '1';
+      signHere.pageNumber = '1';
+      signHere.recipientId = '1';
+      signHere.xPosition = '100';
+      signHere.yPosition = '100';
 
-  it('Get envelope recipients', function(done) {
-    var envelopesApi = new docusign.EnvelopesApi(apiClient);
+      // can have multiple tabs, so need to add to envelope as a single element list
+      var signHereTabs = [];
+      signHereTabs.push(signHere);
+      var tabs = new docusign.Tabs();
+      tabs.signHereTabs = signHereTabs;
+      signer.tabs = tabs;
 
-    var listRecipientsCallback = function(error, recipients, _response){
-      if (error) {
-        return done(error);
-      }
+      // Above causes issue
+      envDef.recipients = new docusign.Recipients();
+      envDef.recipients.signers = [];
+      envDef.recipients.signers.push(signer);
 
-      assert.notStrictEqual(recipients, undefined);
-      done();
-    }
+      // send the envelope (otherwise it will be "created" in the Draft folder
+      envDef.status = 'sent';
 
-    envelopesApi.listRecipients(accountId, envelopeId, listRecipientsCallback)
-  })
+      var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
-  it('Create sender view', function(done) {
-    var fileBytes = null;
-    try {
-      // read file from a local directory
-      fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
-    } catch (ex) {
-      // handle error
-      console.log('Exception: ' + ex);
-    }
+      var getEnvelopeCallback = function(error, envelope, _response) {
+        if (error) {
+          return done(error);
+        }
 
-    // create an envelope to be signed
-    var envDef = new docusign.EnvelopeDefinition();
-    envDef.emailSubject = 'Please Sign my Node SDK Envelope';
-    envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
-
-    // add a document to the envelope
-    var doc = new docusign.Document();
-    var base64Doc = Buffer.from(fileBytes).toString('base64');
-    doc.documentBase64 = base64Doc;
-    doc.name = 'TestFile.pdf';
-    doc.documentId = '1';
-
-    var docs = [];
-    docs.push(doc);
-    envDef.documents = docs;
-
-    // Add a recipient to sign the document
-    var signer = new docusign.Signer();
-    signer.email = userName;
-    var name = 'Pat Developer';
-    signer.name = name;
-    signer.recipientId = '1';
-
-    // this value represents the client's unique identifier for the signer
-    var clientUserId = '2939';
-    signer.clientUserId = clientUserId;
-
-    // create a signHere tab somewhere on the document for the signer to sign
-    // default unit of measurement is pixels, can be mms, cms, inches also
-    var signHere = new docusign.SignHere();
-    signHere.documentId = '1';
-    signHere.pageNumber = '1';
-    signHere.recipientId = '1';
-    signHere.xPosition = '100';
-    signHere.yPosition = '100';
-
-    // can have multiple tabs, so need to add to envelope as a single element list
-    var signHereTabs = [];
-    signHereTabs.push(signHere);
-    var tabs = new docusign.Tabs();
-    tabs.signHereTabs = signHereTabs;
-    signer.tabs = tabs;
-
-    // Above causes issue
-    envDef.recipients = new docusign.Recipients();
-    envDef.recipients.signers = [];
-    envDef.recipients.signers.push(signer);
-
-    // make the envelope with "created" (draft) status
-    envDef.status = 'created';
-
-    var envelopesApi = new docusign.EnvelopesApi(apiClient);
-
-    var createSenderViewCallback = function(error, viewUrl, _response){
-      if (error) {
-        return done(error);
-      }
-
-      if (viewUrl) {
-        console.log('ViewUrl is ' + JSON.stringify(viewUrl));
+        assert.notStrictEqual(envelope, undefined);
         done();
       }
-    }
 
-    var createEnvelopeCallback = function(error, envelopeSummary, _response) {
-      if (error) {
-        return done(error);
+      var createEnvelopeCallback = function(error, envelopeSummary, _response) {
+        if (error) {
+          return done(error);
+        }
+
+        assert.notStrictEqual(envelopeSummary, undefined);
+        envelopeId = envelopeSummary.envelopeId
+
+        envelopesApi.getEnvelope(accountId, envelopeSummary.envelopeId, getEnvelopeCallback);
       }
 
-      assert.notStrictEqual(envelopeSummary, undefined)
-      var returnUrl = 'http://www.docusign.com/developer-center';
-      var returnUrlRequest = new docusign.ReturnUrlRequest();
-      returnUrlRequest.returnUrl = returnUrl;
+      envelopesApi.createEnvelope(accountId, { envelopeDefinition: envDef }, createEnvelopeCallback);
+    })
 
-      envelopesApi.createSenderView(accountId, envelopeSummary.envelopeId, { returnUrlRequest }, createSenderViewCallback)
-    }
+    it('Get envelope recipients', function(done) {
+      var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
-    envelopesApi.createEnvelope(accountId, { envelopeDefinition: envDef }, createEnvelopeCallback)
-  })
+      var listRecipientsCallback = function(error, recipients, _response){
+        if (error) {
+          return done(error);
+        }
 
-  it('Get account info', function(done) {
-    var accountsApi = new docusign.AccountsApi(apiClient);
-
-    var getAccountInformationCallback = function(error, accountInfo, _response){
-      if (error) {
-        return done(error);
+        assert.notStrictEqual(recipients, undefined);
+        done();
       }
-
-      assert.notStrictEqual(accountInfo, undefined);
-      assert.notStrictEqual(accountInfo.accountSettings, undefined);
-      done();
-    }
-
-    accountsApi.getAccountInformation(accountId, { includeAccountSettings: true }, getAccountInformationCallback)
-  })
-
-  it('Update recipients', function(done) {
-    var newSigner = new docusign.Signer();
-    newSigner.email = userName;
-    newSigner.name = 'Signer2';
-    newSigner.recipientId = '2';
-
-    // this value represents the client's unique identifier for the signer
-    var clientUserId = '2939';
-    newSigner.clientUserId = clientUserId;
-
-    // create a signHere tab somewhere on the document for the signer to sign
-    // default unit of measurement is pixels, can be mms, cms, inches also
-    var signHere = new docusign.SignHere();
-    signHere.documentId = '1';
-    signHere.pageNumber = '1';
-    signHere.recipientId = '1';
-    signHere.xPosition = '100';
-    signHere.yPosition = '100';
-
-    // can have multiple tabs, so need to add to envelope as a single element list
-    var signHereTabs = [];
-    signHereTabs.push(signHere);
-    var tabs = new docusign.Tabs();
-    tabs.signHereTabs = signHereTabs;
-    newSigner.tabs = tabs;
-
-    var newRecipients = new docusign.Recipients();
-    newRecipients.signers = [];
-    newRecipients.signers.push(newSigner);
-
-    var envelopesApi = new docusign.EnvelopesApi(apiClient);
-
-    var listRecipientsCallback = function(error, recipients, _response) {
-      if (error) {
-        return done(error);
-      }
-
-      assert.equal(recipients.recipientCount, 2);
-      done();
-    }
-    
-    var updateRecipientsCallback = function(error, recipientsUpdateSummary, _response) {
-      if(error){
-        return done(error);
-      }
-
-      assert.notStrictEqual(recipientsUpdateSummary, undefined);
-      assert.notStrictEqual(recipientsUpdateSummary.recipientUpdateResults, undefined);
 
       envelopesApi.listRecipients(accountId, envelopeId, listRecipientsCallback)
-    }
+    })
 
-    envelopesApi.updateRecipients(accountId, envelopeId, { recipients: newRecipients}, updateRecipientsCallback)
+    it('Create sender view', function(done) {
+      var fileBytes = null;
+      try {
+        // read file from a local directory
+        fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
+      } catch (ex) {
+        // handle error
+        console.log('Exception: ' + ex);
+      }
+
+      // create an envelope to be signed
+      var envDef = new docusign.EnvelopeDefinition();
+      envDef.emailSubject = 'Please Sign my Node SDK Envelope';
+      envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
+
+      // add a document to the envelope
+      var doc = new docusign.Document();
+      var base64Doc = Buffer.from(fileBytes).toString('base64');
+      doc.documentBase64 = base64Doc;
+      doc.name = 'TestFile.pdf';
+      doc.documentId = '1';
+
+      var docs = [];
+      docs.push(doc);
+      envDef.documents = docs;
+
+      // Add a recipient to sign the document
+      var signer = new docusign.Signer();
+      signer.email = userName;
+      var name = 'Pat Developer';
+      signer.name = name;
+      signer.recipientId = '1';
+
+      // this value represents the client's unique identifier for the signer
+      var clientUserId = '2939';
+      signer.clientUserId = clientUserId;
+
+      // create a signHere tab somewhere on the document for the signer to sign
+      // default unit of measurement is pixels, can be mms, cms, inches also
+      var signHere = new docusign.SignHere();
+      signHere.documentId = '1';
+      signHere.pageNumber = '1';
+      signHere.recipientId = '1';
+      signHere.xPosition = '100';
+      signHere.yPosition = '100';
+
+      // can have multiple tabs, so need to add to envelope as a single element list
+      var signHereTabs = [];
+      signHereTabs.push(signHere);
+      var tabs = new docusign.Tabs();
+      tabs.signHereTabs = signHereTabs;
+      signer.tabs = tabs;
+
+      // Above causes issue
+      envDef.recipients = new docusign.Recipients();
+      envDef.recipients.signers = [];
+      envDef.recipients.signers.push(signer);
+
+      // make the envelope with "created" (draft) status
+      envDef.status = 'created';
+
+      var envelopesApi = new docusign.EnvelopesApi(apiClient);
+
+      var createSenderViewCallback = function(error, viewUrl, _response){
+        if (error) {
+          return done(error);
+        }
+
+        if (viewUrl) {
+          console.log('ViewUrl is ' + JSON.stringify(viewUrl));
+          done();
+        }
+      }
+
+      var createEnvelopeCallback = function(error, envelopeSummary, _response) {
+        if (error) {
+          return done(error);
+        }
+
+        assert.notStrictEqual(envelopeSummary, undefined)
+        var returnUrl = 'http://www.docusign.com/developer-center';
+        var returnUrlRequest = new docusign.ReturnUrlRequest();
+        returnUrlRequest.returnUrl = returnUrl;
+
+        envelopesApi.createSenderView(accountId, envelopeSummary.envelopeId, { returnUrlRequest }, createSenderViewCallback)
+      }
+
+      envelopesApi.createEnvelope(accountId, { envelopeDefinition: envDef }, createEnvelopeCallback)
+    })
+
+    it('Update recipients', function(done) {
+      var newSigner = new docusign.Signer();
+      newSigner.email = userName;
+      newSigner.name = 'Signer2';
+      newSigner.recipientId = '2';
+
+      // this value represents the client's unique identifier for the signer
+      var clientUserId = '2939';
+      newSigner.clientUserId = clientUserId;
+
+      // create a signHere tab somewhere on the document for the signer to sign
+      // default unit of measurement is pixels, can be mms, cms, inches also
+      var signHere = new docusign.SignHere();
+      signHere.documentId = '1';
+      signHere.pageNumber = '1';
+      signHere.recipientId = '1';
+      signHere.xPosition = '100';
+      signHere.yPosition = '100';
+
+      // can have multiple tabs, so need to add to envelope as a single element list
+      var signHereTabs = [];
+      signHereTabs.push(signHere);
+      var tabs = new docusign.Tabs();
+      tabs.signHereTabs = signHereTabs;
+      newSigner.tabs = tabs;
+
+      var newRecipients = new docusign.Recipients();
+      newRecipients.signers = [];
+      newRecipients.signers.push(newSigner);
+
+      var envelopesApi = new docusign.EnvelopesApi(apiClient);
+
+      var listRecipientsCallback = function(error, recipients, _response) {
+        if (error) {
+          return done(error);
+        }
+
+        assert.equal(recipients.recipientCount, 2);
+        done();
+      }
+
+      var updateRecipientsCallback = function(error, recipientsUpdateSummary, _response) {
+        if(error){
+          return done(error);
+        }
+
+        assert.notStrictEqual(recipientsUpdateSummary, undefined);
+        assert.notStrictEqual(recipientsUpdateSummary.recipientUpdateResults, undefined);
+
+        envelopesApi.listRecipients(accountId, envelopeId, listRecipientsCallback)
+      }
+
+      envelopesApi.updateRecipients(accountId, envelopeId, { recipients: newRecipients}, updateRecipientsCallback)
+    })
+
+    it('Get audit events', function(done) {
+      var envelopesApi = new docusign.EnvelopesApi(apiClient);
+
+      var listAuditEventsCallback = function(error, envelopeAuditEventResponse, _response) {
+        if (error) {
+          return done(error);
+        }
+
+        assert.notStrictEqual(envelopeAuditEventResponse, undefined);
+        assert.notStrictEqual(envelopeAuditEventResponse.auditEvents, undefined);
+        assert.notStrictEqual(envelopeAuditEventResponse.auditEvents[0], undefined);
+        done();
+      }
+
+      envelopesApi.listAuditEvents(accountId, envelopeId, listAuditEventsCallback)
+    })
+
+    it('Update documents', function(done) {
+      var newFileBytes = null;
+      try {
+        // read file from a local directory
+        newFileBytes = fs.readFileSync(path.resolve(__dirname, SignTest2File));
+      } catch (ex) {
+        // handle error
+        console.log('Exception: ' + ex);
+      }
+
+      var envelopesApi = new docusign.EnvelopesApi(apiClient);
+
+      var newEnvDef = new docusign.EnvelopeDefinition();
+
+      // add a document to the envelope
+      var newDoc = new docusign.Document();
+      var base64Doc2 = Buffer.from(newFileBytes).toString('base64');
+      newDoc.documentBase64 = base64Doc2;
+      newDoc.name = 'TestFile.docx';
+      newDoc.documentId = '2';
+
+      var newDocs = [];
+      newDocs.push(newDoc);
+      newEnvDef.documents = newDocs;
+
+      var oldDocumentsCount = 0;
+
+      var envelopesApi = new docusign.EnvelopesApi(apiClient);
+
+      var secondListDocumentsCallback = function(error, documents, _response) {
+        if (error) {
+          return done(error);
+        }
+
+        assert.notStrictEqual(documents, undefined);
+        assert.notStrictEqual(documents.envelopeDocuments, undefined);
+        assert.equal(documents.envelopeDocuments.length, oldDocumentsCount + 1);
+        done();
+      }
+
+      var updateDocumentsCallback = function(error, envelopeDocumentsResult, _response) {
+        if (error) {
+          return done(error);
+        }
+
+        assert.notStrictEqual(envelopeDocumentsResult, undefined);
+
+        envelopesApi.listDocuments(accountId, envelopeId, secondListDocumentsCallback)
+      }
+
+      var firstListDocumentsCallback = function(error, oldDocuments, _response) {
+        if (error) {
+          return done(error);
+        }
+
+        assert.notStrictEqual(oldDocuments, undefined);
+        assert.notStrictEqual(oldDocuments.envelopeDocuments, undefined);
+        oldDocumentsCount = oldDocuments.envelopeDocuments.length;
+
+        envelopesApi.updateDocuments(accountId, envelopeId, { envelopeDefinition: newEnvDef }, updateDocumentsCallback)
+      }
+
+      envelopesApi.listDocuments(accountId, envelopeId, firstListDocumentsCallback)
+    })
+
+    it('Get recipient tabs', function(done) {
+      var envelopesApi = new docusign.EnvelopesApi(apiClient);
+
+      var listTabsCallback = function(error, tabs, _response) {
+        if (error) {
+          return done(error);
+        }
+
+        assert.notStrictEqual(tabs, undefined);
+        done();
+      }
+
+      var listRecipientsCallback = function(err, recipients, _response) {
+        if (err) {
+          return done(err);
+        }
+
+        assert.notStrictEqual(recipients, undefined);
+        assert.notStrictEqual(recipients.signers, undefined);
+        assert.notStrictEqual(recipients.signers[0], undefined);
+
+        envelopesApi.listTabs(accountId, envelopeId, recipients.signers[0].recipientId, listTabsCallback)
+      }
+
+      envelopesApi.listRecipients(accountId, envelopeId, listRecipientsCallback)
+    })
   })
 
-  it('Get templates', function(done) {
-    var templatesApi = new docusign.TemplatesApi(apiClient);
+  describe('AccountsApi tests:', function () {
+    it('Get account info', function(done) {
+      var accountsApi = new docusign.AccountsApi(apiClient);
 
-    var listTemplatesCallback = function(error, templateResults, _response) {
-      if (error) {
-        return done(error);
+      var getAccountInformationCallback = function(error, accountInfo, _response){
+        if (error) {
+          return done(error);
+        }
+
+        assert.notStrictEqual(accountInfo, undefined);
+        assert.notStrictEqual(accountInfo.accountSettings, undefined);
+        done();
       }
 
-      assert.notStrictEqual(templateResults, undefined);
-      assert.notStrictEqual(templateResults.envelopeTemplates, undefined);
-      done();
-    }
-
-    templatesApi.listTemplates(accountId, listTemplatesCallback)
+      accountsApi.getAccountInformation(accountId, { includeAccountSettings: true }, getAccountInformationCallback)
+    })
   })
 
-  it('Get users', function(done) {
-    var usersApi = new docusign.UsersApi(apiClient);
+  describe('TemplatesApi tests:', function () {
+    it('Get templates', function(done) {
+      var templatesApi = new docusign.TemplatesApi(apiClient);
 
-    var listUsersCallback = function(error, userInformationList, __response) {
-      if (error) {
-        return done(error);
+      var listTemplatesCallback = function(error, templateResults, _response) {
+        if (error) {
+          return done(error);
+        }
+
+        assert.notStrictEqual(templateResults, undefined);
+        assert.notStrictEqual(templateResults.envelopeTemplates, undefined);
+        done();
       }
 
-      assert.notStrictEqual(userInformationList, undefined);
-      assert.notStrictEqual(userInformationList.users, undefined);
-      assert.notStrictEqual(userInformationList.users[0], undefined);
-      done();
-    }
-
-    usersApi.list(accountId, listUsersCallback)
+      templatesApi.listTemplates(accountId, listTemplatesCallback)
+    })
   })
 
-  it('Get audit events', function(done) {
-    var envelopesApi = new docusign.EnvelopesApi(apiClient);
+  describe('UsersApi tests:', function () {
+    it('Get users', function(done) {
+      var usersApi = new docusign.UsersApi(apiClient);
 
-    var listAuditEventsCallback = function(error, envelopeAuditEventResponse, _response) {
-      if (error) {
-        return done(error);
+      var listUsersCallback = function(error, userInformationList, __response) {
+        if (error) {
+          return done(error);
+        }
+
+        assert.notStrictEqual(userInformationList, undefined);
+        assert.notStrictEqual(userInformationList.users, undefined);
+        assert.notStrictEqual(userInformationList.users[0], undefined);
+        done();
       }
 
-      assert.notStrictEqual(envelopeAuditEventResponse, undefined);
-      assert.notStrictEqual(envelopeAuditEventResponse.auditEvents, undefined);
-      assert.notStrictEqual(envelopeAuditEventResponse.auditEvents[0], undefined);
-      done();
-    }
-
-    envelopesApi.listAuditEvents(accountId, envelopeId, listAuditEventsCallback)
-  })
-
-  it('Update documents', function(done) {
-    var newFileBytes = null;
-    try {
-      // read file from a local directory
-      newFileBytes = fs.readFileSync(path.resolve(__dirname, SignTest2File));
-    } catch (ex) {
-      // handle error
-      console.log('Exception: ' + ex);
-    }
-
-    var envelopesApi = new docusign.EnvelopesApi(apiClient);
-
-    var newEnvDef = new docusign.EnvelopeDefinition();
-    
-    // add a document to the envelope
-    var newDoc = new docusign.Document();
-    var base64Doc2 = Buffer.from(newFileBytes).toString('base64');
-    newDoc.documentBase64 = base64Doc2;
-    newDoc.name = 'TestFile.docx';
-    newDoc.documentId = '2';
-
-    var newDocs = [];
-    newDocs.push(newDoc);
-    newEnvDef.documents = newDocs;
-    
-    var oldDocumentsCount = 0;
-
-    var envelopesApi = new docusign.EnvelopesApi(apiClient);
-
-    var secondListDocumentsCallback = function(error, documents, _response) {
-      if (error) {
-        return done(error);
-      }
-      
-      assert.notStrictEqual(documents, undefined);
-      assert.notStrictEqual(documents.envelopeDocuments, undefined);
-      assert.equal(documents.envelopeDocuments.length, oldDocumentsCount + 1);
-      done();
-    }
-
-    var updateDocumentsCallback = function(error, envelopeDocumentsResult, _response) {
-      if (error) {
-        return done(error);
-      }
-      
-      assert.notStrictEqual(envelopeDocumentsResult, undefined);
-      
-      envelopesApi.listDocuments(accountId, envelopeId, secondListDocumentsCallback)
-    }
-
-    var firstListDocumentsCallback = function(error, oldDocuments, _response) {
-      if (error) {
-        return done(error);
-      }
-      
-      assert.notStrictEqual(oldDocuments, undefined);
-      assert.notStrictEqual(oldDocuments.envelopeDocuments, undefined);
-      oldDocumentsCount = oldDocuments.envelopeDocuments.length;
-
-      envelopesApi.updateDocuments(accountId, envelopeId, { envelopeDefinition: newEnvDef }, updateDocumentsCallback)
-    }
-
-    envelopesApi.listDocuments(accountId, envelopeId, firstListDocumentsCallback)
-  })
-
-  it('Get recipient tabs', function(done) {
-    var envelopesApi = new docusign.EnvelopesApi(apiClient);
-
-    var listTabsCallback = function(error, tabs, _response) {
-      if (error) {
-        return done(error);
-      }
-
-      assert.notStrictEqual(tabs, undefined);
-      done();
-    }
-
-    var listRecipientsCallback = function(err, recipients, _response) {
-      if (err) {
-        return done(err);
-      }
-
-      assert.notStrictEqual(recipients, undefined);
-      assert.notStrictEqual(recipients.signers, undefined);
-      assert.notStrictEqual(recipients.signers[0], undefined);
-      
-      envelopesApi.listTabs(accountId, envelopeId, recipients.signers[0].recipientId, listTabsCallback)
-    }
-
-    envelopesApi.listRecipients(accountId, envelopeId, listRecipientsCallback)
+      usersApi.list(accountId, listUsersCallback)
+    })
   })
 });
