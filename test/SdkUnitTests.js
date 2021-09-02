@@ -68,7 +68,6 @@ describe('SDK Unit Tests:', function (done) {
     // open DocuSign OAuth authorization url in the browser, login and grant access
     console.log(oauthLoginUrl);
     // END OF NOTE
-    var fs = require('fs');
     var privateKeyFile = fs.readFileSync(path.resolve(__dirname, privateKeyFilename));
     apiClient.requestJWTUserToken(integratorKey, userId, scopes, privateKeyFile, expiresIn)
       .then(function (res) {
@@ -122,7 +121,6 @@ describe('SDK Unit Tests:', function (done) {
    *
    */
   it('should be able to request a JWT user token', function (done) {
-    var fs = require('fs');
     var privateKeyFile = fs.readFileSync(path.resolve(__dirname, privateKeyFilename));
     apiClient.requestJWTUserToken(integratorKey, userId, scopes, privateKeyFile, expiresIn)
       .then(function (response) {
@@ -135,7 +133,6 @@ describe('SDK Unit Tests:', function (done) {
   });
 
   it('should be able to request a JWT application token', function (done) {
-    var fs = require('fs');
     var privateKeyFile = fs.readFileSync(path.resolve(__dirname, privateKeyFilename));
 
     apiClient.requestJWTApplicationToken(integratorKey, scopes, privateKeyFile, expiresIn)
@@ -284,7 +281,6 @@ describe('SDK Unit Tests:', function (done) {
   it('requestASignature', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -500,7 +496,6 @@ describe('SDK Unit Tests:', function (done) {
   it('embeddedSigning', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -596,7 +591,6 @@ describe('SDK Unit Tests:', function (done) {
   it('createTemplate', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -667,7 +661,6 @@ describe('SDK Unit Tests:', function (done) {
   it('downLoadEnvelopeDocuments', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, LargeTestDocument1));
     } catch (ex) {
@@ -736,7 +729,6 @@ describe('SDK Unit Tests:', function (done) {
             .then(function (pdfBytes) {
               if (pdfBytes) {
                 try {
-                  var fs = require('fs');
                   // download the document pdf
                   var filename = accountId + '_' + envelopeSummary.envelopeId + '_combined.pdf';
                   var tempFile = path.resolve(__dirname, filename);
@@ -856,7 +848,6 @@ describe('SDK Unit Tests:', function (done) {
   it('getDiagnosticLogs', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -934,7 +925,6 @@ describe('SDK Unit Tests:', function (done) {
                   .then(function (pdfBytes) {
                     if (pdfBytes) {
                       try {
-                        var fs = require('fs');
                         // download the document pdf
                         var filename = accountId + '_' + envelopeSummary.envelopeId + '_combined.pdf';
                         var tempFile = path.resolve(__dirname, filename);
@@ -954,7 +944,6 @@ describe('SDK Unit Tests:', function (done) {
                               .then(function (diagBytes) {
                                 if (diagBytes) {
                                   try {
-                                    var fs = require('fs');
                                     // download the document pdf
                                     var filename = requestLogId + '.txt';
                                     var tempFile = path.resolve(__dirname, filename);
@@ -1081,7 +1070,6 @@ describe('SDK Unit Tests:', function (done) {
   it('create template with date and number tabs', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -1177,7 +1165,6 @@ describe('SDK Unit Tests:', function (done) {
   it('resend envelope with envelope update', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -1330,12 +1317,11 @@ describe('SDK Unit Tests:', function (done) {
   it('Create sender view', function(done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
       // handle error
-      console.log('Exception: ' + ex);
+      console.log(`Exception: ${ex}`);
     }
 
     // create an envelope to be signed
@@ -1392,24 +1378,17 @@ describe('SDK Unit Tests:', function (done) {
     var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
     envelopesApi.createEnvelope(accountId, { envelopeDefinition: envDef })
-      .then(function (viewUrl) {
-        if (viewUrl) {
+      .then(function (envelopeSummary) {
           var returnUrl = 'http://www.docusign.com/developer-center';
           var returnUrlRequest = new docusign.ReturnUrlRequest();
           returnUrlRequest.returnUrl = returnUrl;
 
-          envelopesApi.createRecipientView(accountId, envelopeSummary.envelopeId, { recipientViewRequest: returnUrlRequest })
-            .then(function (viewUrl) {
-              if (viewUrl) {
-                console.log('ViewUrl is ' + JSON.stringify(viewUrl));
-                done();
-              }
-            })
-            .catch(function (error) {
-              if (error) {
-                return done(error);
-              }
-            });
+          return envelopesApi.createSenderView(accountId, envelopeSummary.envelopeId, { returnUrlRequest })
+      })
+      .then(function (viewUrl) {
+        if (viewUrl) {
+          console.log(`ViewUrl is ${JSON.stringify(viewUrl)}`);
+          done();
         }
       })
       .catch(function (error) {
@@ -1424,11 +1403,9 @@ describe('SDK Unit Tests:', function (done) {
 
     accountsApi.getAccountInformation(accountId, { includeAccountSettings: true })
       .then(function (accountInfo) {
-        if (accountInfo) {
-          assert.notStrictEqual(accountInfo, undefined);
-          assert.notStrictEqual(accountInfo.accountSettings, undefined);
-          done();
-        }
+        assert.notStrictEqual(accountInfo, undefined);
+        assert.notStrictEqual(accountInfo.accountSettings, undefined);
+        done();
       })
       .catch(function (error) {
         if (error) {
@@ -1474,17 +1451,12 @@ describe('SDK Unit Tests:', function (done) {
         assert.notStrictEqual(recipientsUpdateSummary, undefined);
         assert.notStrictEqual(recipientsUpdateSummary.recipientUpdateResults, undefined);
 
-        envelopesApi.listRecipients(accountId, envelopeId)
-          .then(function (recipients) {
-            assert.notStrictEqual(recipients, undefined);
-            assert.equal(recipients.recipientCount, 2);
-            done();
-          })
-          .catch(function (error) {
-            if (error) {
-              return done(error);
-            }
-          });
+        return envelopesApi.listRecipients(accountId, envelopeId)
+      })
+      .then(function (recipients) {
+        assert.notStrictEqual(recipients, undefined);
+        assert.equal(recipients.recipientCount, 2);
+        done();
       })
       .catch(function (error) {
         if(error){
@@ -1498,12 +1470,10 @@ describe('SDK Unit Tests:', function (done) {
 
     templatesApi.listTemplates(accountId)
       .then(function (templateResults) {
-        if (templateResults) {
-          assert.notStrictEqual(templateResults, undefined);
-          assert.notStrictEqual(templateResults.envelopeTemplates, undefined);
-          assert.notStrictEqual(templateResults.envelopeTemplates[0], undefined);
-          done();
-        }
+        assert.notStrictEqual(templateResults, undefined);
+        assert.notStrictEqual(templateResults.envelopeTemplates, undefined);
+        assert.notStrictEqual(templateResults.envelopeTemplates[0], undefined);
+        done();
       })
       .catch(function (error) {
         if (error) {
@@ -1517,12 +1487,10 @@ describe('SDK Unit Tests:', function (done) {
 
     usersApi.list(accountId)
       .then(function (userInformationList) {
-        if (userInformationList) {
-          assert.notStrictEqual(userInformationList, undefined);
-          assert.notStrictEqual(userInformationList.users, undefined);
-          assert.notStrictEqual(userInformationList.users[0], undefined);
-          done();
-        }
+        assert.notStrictEqual(userInformationList, undefined);
+        assert.notStrictEqual(userInformationList.users, undefined);
+        assert.notStrictEqual(userInformationList.users[0], undefined);
+        done();
       })
       .catch(function (error) {
         if (error) {
@@ -1551,12 +1519,11 @@ describe('SDK Unit Tests:', function (done) {
   it('Update documents', function(done) {
     var newFileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       newFileBytes = fs.readFileSync(path.resolve(__dirname, SignTest2File));
     } catch (ex) {
       // handle error
-      console.log('Exception: ' + ex);
+      console.log(`Exception: ${ex}`);
     }
 
     var envelopesApi = new docusign.EnvelopesApi(apiClient);
@@ -1573,35 +1540,26 @@ describe('SDK Unit Tests:', function (done) {
     var newDocs = [];
     newDocs.push(newDoc);
     newEnvDef.documents = newDocs;
+    var oldDocumentsCount = 0;
 
     envelopesApi.listDocuments(accountId, envelopeId)
       .then(function (oldDocuments) {
         assert.notStrictEqual(oldDocuments, undefined);
         assert.notStrictEqual(oldDocuments.envelopeDocuments, undefined);
-        var oldDocumentsCount = oldDocuments.envelopeDocuments.length;
+        oldDocumentsCount = oldDocuments.envelopeDocuments.length;
 
-        envelopesApi.updateDocuments(accountId, envelopeId, { envelopeDefinition: newEnvDef })
-          .then(function (envelopeDocumentsResult) {
-            assert.notStrictEqual(envelopeDocumentsResult, undefined);
+        return envelopesApi.updateDocuments(accountId, envelopeId, { envelopeDefinition: newEnvDef })
+      })
+      .then(function (envelopeDocumentsResult) {
+        assert.notStrictEqual(envelopeDocumentsResult, undefined);
 
-            envelopesApi.listDocuments(accountId, envelopeId)
-              .then(function (documents) {
-                assert.notStrictEqual(documents, undefined);
-                assert.notStrictEqual(documents.envelopeDocuments, undefined);
-                assert.equal(documents.envelopeDocuments.length, oldDocumentsCount + 1);
-                done();
-              })
-              .catch(function (error) {
-                if (error) {
-                  return done(error);
-                }
-              });
-          })
-          .catch(function (error) {
-            if (error) {
-              return done(error);
-            }
-          });
+        return envelopesApi.listDocuments(accountId, envelopeId)
+      })
+      .then(function (documents) {
+        assert.notStrictEqual(documents, undefined);
+        assert.notStrictEqual(documents.envelopeDocuments, undefined);
+        assert.equal(documents.envelopeDocuments.length, oldDocumentsCount + 1);
+        done();
       })
       .catch(function (error) {
         if (error) {
@@ -1619,16 +1577,11 @@ describe('SDK Unit Tests:', function (done) {
         assert.notStrictEqual(recipients.signers, undefined);
         assert.notStrictEqual(recipients.signers[0], undefined);
         
-        envelopesApi.listTabs(accountId, envelopeId, recipients.signers[0].recipientId)
-          .then(function(tabs) {
-            assert.notStrictEqual(tabs, undefined);
-            done();
-          })
-          .catch(function (error) {
-            if (error) {
-              return done(error);
-            }
-          })
+        return envelopesApi.listTabs(accountId, envelopeId, recipients.signers[0].recipientId)
+      })
+      .then(function(tabs) {
+        assert.notStrictEqual(tabs, undefined);
+        done();
       })
       .catch(function (error) {
         if (error) {

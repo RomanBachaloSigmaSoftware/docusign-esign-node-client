@@ -5,6 +5,7 @@ var config = require('../test-config');
 var assert = require('assert');
 var path = require('path');
 var superagent = require('superagent');
+var fs = require('fs');
 
 var userName = config.email;
 var integratorKey = config.integratorKey;
@@ -45,7 +46,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
     // open DocuSign OAuth authorization url in the browser, login and grant access
     console.log(oauthLoginUrl);
     // END OF NOTE
-    var fs = require('fs');
     var privateKeyFile = fs.readFileSync(path.resolve(__dirname, privateKeyFilename));
     apiClient.requestJWTUserToken(integratorKey, userId, scopes, privateKeyFile, expiresIn, function (err, res) {
       var baseUri,
@@ -92,7 +92,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
    *
    */
   it('should be able to request a JWT user token', function (done) {
-    var fs = require('fs');
     var privateKeyFile = fs.readFileSync(path.resolve(__dirname, privateKeyFilename));
     try {
       apiClient.requestJWTUserToken(integratorKey, userId, scopes, privateKeyFile, expiresIn, function (err, response) {
@@ -108,7 +107,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
   });
 
   it('should be able to request a JWT application token', function (done) {
-    var fs = require('fs');
     var privateKeyFile = fs.readFileSync(path.resolve(__dirname, privateKeyFilename));
 
     apiClient.requestJWTApplicationToken(integratorKey, scopes, privateKeyFile, expiresIn, function (err, response) {
@@ -245,7 +243,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
   it('requestASignature', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -358,7 +355,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
   it('embeddedSigning', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -450,7 +446,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
   it('createTemplate', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -520,7 +515,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
   it('downLoadEnvelopeDocuments', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, LargeTestDocument1));
     } catch (ex) {
@@ -595,7 +589,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
 
           if (pdfBytes) {
             try {
-              var fs = require('fs');
               // download the document pdf
               var filename = accountId + '_' + envelopeSummary.envelopeId + '_combined.pdf';
               var tempFile = path.resolve(__dirname, filename);
@@ -641,7 +634,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
   it('getDiagnosticLogs', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -728,7 +720,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
 
               if (pdfBytes) {
                 try {
-                  var fs = require('fs');
                   // download the document pdf
                   var filename = accountId + '_' + envelopeSummary.envelopeId + '_combined.pdf';
                   var tempFile = path.resolve(__dirname, filename);
@@ -754,7 +745,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
 
                       if (diagBytes) {
                         try {
-                          var fs = require('fs');
                           // download the document pdf
                           var filename = requestLogId + '.txt';
                           var tempFile = path.resolve(__dirname, filename);
@@ -805,7 +795,6 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
   it('resend envelope with envelope update', function (done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -888,34 +877,37 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
 
   it('Get envelope by id', function(done) {
     var envelopesApi = new docusign.EnvelopesApi(apiClient);
-
-    envelopesApi.getEnvelope(accountId, envelopeId, function(error, envelope, _response){
+    
+    var getEnvelopeCallback = function(error, envelope, _response){
       if (error) {
         return done(error);
       }
 
       assert.notStrictEqual(envelope, undefined);
       done();
-    });
+    }
+
+    envelopesApi.getEnvelope(accountId, envelopeId, getEnvelopeCallback);
   })
 
   it('Get envelope recipients', function(done) {
     var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
-    envelopesApi.listRecipients(accountId, envelopeId, function(error, recipients, _response){
+    var listRecipientsCallback = function(error, recipients, _response){
       if (error) {
         return done(error);
       }
 
       assert.notStrictEqual(recipients, undefined);
       done();
-    })
+    }
+
+    envelopesApi.listRecipients(accountId, envelopeId, listRecipientsCallback)
   })
 
   it('Create sender view', function(done) {
     var fileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SignTest1File));
     } catch (ex) {
@@ -976,44 +968,47 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
 
     var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
-    envelopesApi.createEnvelope(accountId, { envelopeDefinition: envDef }, function(error, envelopeSummary, _response) {
+    var createSenderViewCallback = function(error, viewUrl, _response){
       if (error) {
         return done(error);
       }
 
-      if (envelopeSummary) {
-        var returnUrl = 'http://www.docusign.com/developer-center';
-        var returnUrlRequest = new docusign.ReturnUrlRequest();
-        returnUrlRequest.returnUrl = returnUrl;
-
-        envelopesApi.createRecipientView(accountId, envelopeSummary.envelopeId, { recipientViewRequest: returnUrlRequest }, function(error, viewUrl, _response){
-          if (error) {
-            return done(error);
-          }
-
-          if (viewUrl) {
-            console.log('ViewUrl is ' + JSON.stringify(viewUrl));
-            done();
-          }
-        })
+      if (viewUrl) {
+        console.log('ViewUrl is ' + JSON.stringify(viewUrl));
+        done();
       }
-    })
+    }
+
+    var createEnvelopeCallback = function(error, envelopeSummary, _response) {
+      if (error) {
+        return done(error);
+      }
+
+      assert.notStrictEqual(envelopeSummary, undefined)
+      var returnUrl = 'http://www.docusign.com/developer-center';
+      var returnUrlRequest = new docusign.ReturnUrlRequest();
+      returnUrlRequest.returnUrl = returnUrl;
+
+      envelopesApi.createSenderView(accountId, envelopeSummary.envelopeId, { returnUrlRequest }, createSenderViewCallback)
+    }
+
+    envelopesApi.createEnvelope(accountId, { envelopeDefinition: envDef }, createEnvelopeCallback)
   })
 
   it('Get account info', function(done) {
     var accountsApi = new docusign.AccountsApi(apiClient);
 
-    accountsApi.getAccountInformation(accountId, { includeAccountSettings: true }, function(error, accountInfo, _response){
+    var getAccountInformationCallback = function(error, accountInfo, _response){
       if (error) {
         return done(error);
       }
 
-      if (accountInfo) {
-        assert.notStrictEqual(accountInfo, undefined);
-        assert.notStrictEqual(accountInfo.accountSettings, undefined);
-        done();
-      }
-    })
+      assert.notStrictEqual(accountInfo, undefined);
+      assert.notStrictEqual(accountInfo.accountSettings, undefined);
+      done();
+    }
+
+    accountsApi.getAccountInformation(accountId, { includeAccountSettings: true }, getAccountInformationCallback)
   })
 
   it('Update recipients', function(done) {
@@ -1047,8 +1042,17 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
     newRecipients.signers.push(newSigner);
 
     var envelopesApi = new docusign.EnvelopesApi(apiClient);
+
+    var listRecipientsCallback = function(error, recipients, _response) {
+      if (error) {
+        return done(error);
+      }
+
+      assert.equal(recipients.recipientCount, 2);
+      done();
+    }
     
-    envelopesApi.updateRecipients(accountId, envelopeId, { recipients: newRecipients}, function(error, recipientsUpdateSummary, _response) {
+    var updateRecipientsCallback = function(error, recipientsUpdateSummary, _response) {
       if(error){
         return done(error);
       }
@@ -1056,54 +1060,49 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
       assert.notStrictEqual(recipientsUpdateSummary, undefined);
       assert.notStrictEqual(recipientsUpdateSummary.recipientUpdateResults, undefined);
 
-      envelopesApi.listRecipients(accountId, envelopeId, function(error, recipients, _response) {
-        if (error) {
-          return done(error);
-        }
+      envelopesApi.listRecipients(accountId, envelopeId, listRecipientsCallback)
+    }
 
-        assert.equal(recipients.recipientCount, 2);
-        done();
-      })
-    })
+    envelopesApi.updateRecipients(accountId, envelopeId, { recipients: newRecipients}, updateRecipientsCallback)
   })
 
   it('Get templates', function(done) {
     var templatesApi = new docusign.TemplatesApi(apiClient);
 
-    templatesApi.listTemplates(accountId, function(error, templateResults, _response) {
+    var listTemplatesCallback = function(error, templateResults, _response) {
       if (error) {
         return done(error);
       }
 
-      if (templateResults) {
-        assert.notStrictEqual(templateResults, undefined);
-        assert.notStrictEqual(templateResults.envelopeTemplates, undefined);
-        done();
-      }
-    })
+      assert.notStrictEqual(templateResults, undefined);
+      assert.notStrictEqual(templateResults.envelopeTemplates, undefined);
+      done();
+    }
+
+    templatesApi.listTemplates(accountId, listTemplatesCallback)
   })
 
   it('Get users', function(done) {
     var usersApi = new docusign.UsersApi(apiClient);
 
-    usersApi.list(accountId, function(error, userInformationList, __response) {
+    var listUsersCallback = function(error, userInformationList, __response) {
       if (error) {
         return done(error);
       }
 
-      if (userInformationList) {
-        assert.notStrictEqual(userInformationList, undefined);
-        assert.notStrictEqual(userInformationList.users, undefined);
-        assert.notStrictEqual(userInformationList.users[0], undefined);
-        done();
-      }
-    })
+      assert.notStrictEqual(userInformationList, undefined);
+      assert.notStrictEqual(userInformationList.users, undefined);
+      assert.notStrictEqual(userInformationList.users[0], undefined);
+      done();
+    }
+
+    usersApi.list(accountId, listUsersCallback)
   })
 
   it('Get audit events', function(done) {
     var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
-    envelopesApi.listAuditEvents(accountId, envelopeId, function(error, envelopeAuditEventResponse, _response) {
+    var listAuditEventsCallback = function(error, envelopeAuditEventResponse, _response) {
       if (error) {
         return done(error);
       }
@@ -1112,13 +1111,14 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
       assert.notStrictEqual(envelopeAuditEventResponse.auditEvents, undefined);
       assert.notStrictEqual(envelopeAuditEventResponse.auditEvents[0], undefined);
       done();
-    })
+    }
+
+    envelopesApi.listAuditEvents(accountId, envelopeId, listAuditEventsCallback)
   })
 
   it('Update documents', function(done) {
     var newFileBytes = null;
     try {
-      var fs = require('fs');
       // read file from a local directory
       newFileBytes = fs.readFileSync(path.resolve(__dirname, SignTest2File));
     } catch (ex) {
@@ -1140,43 +1140,60 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
     var newDocs = [];
     newDocs.push(newDoc);
     newEnvDef.documents = newDocs;
+    
+    var oldDocumentsCount = 0;
 
     var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
-    envelopesApi.listDocuments(accountId, envelopeId, function(error, oldDocuments, _response) {
+    var secondListDocumentsCallback = function(error, documents, _response) {
+      if (error) {
+        return done(error);
+      }
+      
+      assert.notStrictEqual(documents, undefined);
+      assert.notStrictEqual(documents.envelopeDocuments, undefined);
+      assert.equal(documents.envelopeDocuments.length, oldDocumentsCount + 1);
+      done();
+    }
+
+    var updateDocumentsCallback = function(error, envelopeDocumentsResult, _response) {
+      if (error) {
+        return done(error);
+      }
+      
+      assert.notStrictEqual(envelopeDocumentsResult, undefined);
+      
+      envelopesApi.listDocuments(accountId, envelopeId, secondListDocumentsCallback)
+    }
+
+    var firstListDocumentsCallback = function(error, oldDocuments, _response) {
       if (error) {
         return done(error);
       }
       
       assert.notStrictEqual(oldDocuments, undefined);
       assert.notStrictEqual(oldDocuments.envelopeDocuments, undefined);
-      var oldDocumentsCount = oldDocuments.envelopeDocuments.length;
+      oldDocumentsCount = oldDocuments.envelopeDocuments.length;
 
-      envelopesApi.updateDocuments(accountId, envelopeId, { envelopeDefinition: newEnvDef }, function(error, envelopeDocumentsResult, _response) {
-        if (error) {
-          return done(error);
-        }
-        
-        assert.notStrictEqual(envelopeDocumentsResult, undefined);
-        
-        envelopesApi.listDocuments(accountId, envelopeId, function(error, documents, _response) {
-          if (error) {
-            return done(error);
-          }
-          
-          assert.notStrictEqual(documents, undefined);
-          assert.notStrictEqual(documents.envelopeDocuments, undefined);
-          assert.equal(documents.envelopeDocuments.length, oldDocumentsCount + 1);
-          done();
-        })
-      })
-    })
+      envelopesApi.updateDocuments(accountId, envelopeId, { envelopeDefinition: newEnvDef }, updateDocumentsCallback)
+    }
+
+    envelopesApi.listDocuments(accountId, envelopeId, firstListDocumentsCallback)
   })
 
   it('Get recipient tabs', function(done) {
     var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
-    envelopesApi.listRecipients(accountId, envelopeId, function(err, recipients, _response) {
+    var listTabsCallback = function(error, tabs, _response) {
+      if (error) {
+        return done(error);
+      }
+
+      assert.notStrictEqual(tabs, undefined);
+      done();
+    }
+
+    var listRecipientsCallback = function(err, recipients, _response) {
       if (err) {
         return done(err);
       }
@@ -1185,14 +1202,9 @@ describe('SDK Unit Tests With Callbacks:', function (done) {
       assert.notStrictEqual(recipients.signers, undefined);
       assert.notStrictEqual(recipients.signers[0], undefined);
       
-      envelopesApi.listTabs(accountId, envelopeId, recipients.signers[0].recipientId, function(error, tabs, _response) {
-        if (error) {
-          return done(error);
-        }
+      envelopesApi.listTabs(accountId, envelopeId, recipients.signers[0].recipientId, listTabsCallback)
+    }
 
-        assert.notStrictEqual(tabs, undefined);
-        done();
-      })
-    })
+    envelopesApi.listRecipients(accountId, envelopeId, listRecipientsCallback)
   })
 });
