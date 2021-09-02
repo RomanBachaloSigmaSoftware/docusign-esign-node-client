@@ -95,7 +95,7 @@ describe('SDK Unit Tests (Sigma):', function (done) {
   });
   
   describe('EnvelopesApi tests:', function () {
-    it("Get envelope by id", function (done) {
+    it('Get envelope by id', function (done) {
       var fileBytes = null;
       try {
         // read file from a local directory
