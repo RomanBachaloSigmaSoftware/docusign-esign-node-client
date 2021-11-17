@@ -1,9 +1,9 @@
-const docusign = require('../src/index');
-const assert = require('assert');
-const { JWTAuth } = require('./helpers');
-const { USER_ID, apiClient } = require('./constants');
+var docusign = require('../src/index');
+var assert = require('assert');
+var { JWTAuth } = require('./helpers');
+var { USER_ID, apiClient } = require('./constants');
 
-let ACCOUNT_ID = '';
+var ACCOUNT_ID = '';
 
 describe('UsersApi tests:', () => {
   before((done) => {
@@ -18,7 +18,7 @@ describe('UsersApi tests:', () => {
     }
   });
 
-  const usersApi = new docusign.UsersApi(apiClient);
+  var usersApi = new docusign.UsersApi(apiClient);
 
   it('should return the list of users for the specified account', (done) => {
     usersApi.list(ACCOUNT_ID)
@@ -54,14 +54,14 @@ describe('UsersApi tests:', () => {
       });
   });
   it('should create and add new user to the specified account if newUsersDefinition option is provided with user data', (done) => {
-    const newUser = new docusign.UserInformation();
+    var newUser = new docusign.UserInformation();
     newUser.company = 'TestCompany';
     newUser.email = 'test@email.com';
     newUser.firstName = 'First';
     newUser.lastName = 'Last';
     newUser.userName = 'TestUserName';
 
-    const newUsersDefinition = new docusign.NewUsersDefinition();
+    var newUsersDefinition = new docusign.NewUsersDefinition();
     newUsersDefinition.newUsers = [];
     newUsersDefinition.newUsers.push(newUser);
 

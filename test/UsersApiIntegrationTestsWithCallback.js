@@ -1,9 +1,9 @@
-const docusign = require('../src/index');
-const assert = require('assert');
-const { JWTAuth } = require('./helpers');
-const { USER_ID, apiClient } = require('./constants');
+var docusign = require('../src/index');
+var assert = require('assert');
+var { JWTAuth } = require('./helpers');
+var { USER_ID, apiClient } = require('./constants');
 
-let ACCOUNT_ID = '';
+var ACCOUNT_ID = '';
 
 describe('UsersApi Tests With Callbacks:', () => {
   before((done) => {
@@ -18,10 +18,10 @@ describe('UsersApi Tests With Callbacks:', () => {
     }
   });
 
-  const usersApi = new docusign.UsersApi(apiClient);
+  var usersApi = new docusign.UsersApi(apiClient);
 
   it('should return the list of users for the specified account', (done) => {
-    const listUsersCallback = function (error, userInformationList, __response) {
+    var listUsersCallback = function (error, userInformationList, __response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -36,7 +36,7 @@ describe('UsersApi Tests With Callbacks:', () => {
   });
 
   it('getInformation returns the user information for a specified user', (done) => {
-    const callback = function (error, data, __response) {
+    var callback = function (error, data, __response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -52,18 +52,18 @@ describe('UsersApi Tests With Callbacks:', () => {
   });
 
   it('should create and add new user to the specified account if newUsersDefinition option is provided with user data', (done) => {
-    const newUser = new docusign.UserInformation();
+    var newUser = new docusign.UserInformation();
     newUser.company = 'TestCompany';
     newUser.email = 'test@email.com';
     newUser.firstName = 'First';
     newUser.lastName = 'Last';
     newUser.userName = 'TestUserName';
 
-    const newUsersDefinition = new docusign.NewUsersDefinition();
+    var newUsersDefinition = new docusign.NewUsersDefinition();
     newUsersDefinition.newUsers = [];
     newUsersDefinition.newUsers.push(newUser);
 
-    const callback = function (error, data, __response) {
+    var callback = function (error, data, __response) {
       if (error) {
         console.error(error);
         return done(error);

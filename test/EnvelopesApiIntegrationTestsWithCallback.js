@@ -1,21 +1,21 @@
-const docusign = require('../src/index');
-const assert = require('assert');
-const path = require('path');
-const Buffer = global.Buffer.from ? global.Buffer : require('safe-buffer').Buffer;
-const fs = require('fs');
+var docusign = require('../src/index');
+var assert = require('assert');
+var path = require('path');
+var Buffer = global.Buffer.from ? global.Buffer : require('safe-buffer').Buffer;
+var fs = require('fs');
 
-const {
+var {
   EMAIL,
   SING_TEST1_FILE,
   SING_TEST2_FILE,
   apiClient,
   getSignerTabsDefinition
 } = require('./constants');
-const { JWTAuth } = require('./helpers');
+var { JWTAuth } = require('./helpers');
 
-let ACCOUNT_ID = '';
-let ENVELOPE_ID = '';
-let RECIPIENT_ID = '';
+var ACCOUNT_ID = '';
+var ENVELOPE_ID = '';
+var RECIPIENT_ID = '';
 
 describe('EnvelopesApi Tests With Callbacks:', () => {
   before((done) => {
@@ -30,10 +30,10 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
     }
   });
 
-  const envelopesApi = new docusign.EnvelopesApi(apiClient);
+  var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
   it('getEnvelope returns correct envelope summary by envelopeId', (done) => {
-    let fileBytes = null;
+    var fileBytes = null;
     try {
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SING_TEST1_FILE));
@@ -43,40 +43,40 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
     }
 
     // create an envelope to be signed
-    const envDef = new docusign.EnvelopeDefinition();
+    var envDef = new docusign.EnvelopeDefinition();
     envDef.emailSubject = 'Please Sign my Node SDK Envelope';
     envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
     // add a document to the envelope
-    const doc = new docusign.Document();
-    const base64Doc = Buffer.from(fileBytes).toString('base64');
+    var doc = new docusign.Document();
+    var base64Doc = Buffer.from(fileBytes).toString('base64');
     doc.documentBase64 = base64Doc;
     doc.name = 'TestFile.pdf';
     doc.documentId = '1';
 
-    const docs = [];
+    var docs = [];
     docs.push(doc);
     envDef.documents = docs;
 
     // Add a recipient to sign the document
-    const signer1 = new docusign.Signer();
+    var signer1 = new docusign.Signer();
     signer1.email = EMAIL;
     signer1.name = 'Pat Developer';
     signer1.recipientId = '1';
 
-    const signer2 = new docusign.Signer();
+    var signer2 = new docusign.Signer();
     signer2.email = 'another@email.com';
     signer2.name = 'Pat Manager';
     signer2.recipientId = '2';
 
-    const signer3 = new docusign.Signer();
+    var signer3 = new docusign.Signer();
     signer3.email = 'another2@email.com';
     signer3.name = 'Pat Mentor';
     signer3.recipientId = '3';
 
     // create a signHere tab somewhere on the document for the signer to sign
     // default unit of measurement is pixels, can be mms, cms, inches also
-    const tabs = getSignerTabsDefinition();
+    var tabs = getSignerTabsDefinition();
     signer1.tabs = tabs;
     signer2.tabs = tabs;
     signer3.tabs = tabs;
@@ -89,7 +89,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
     // send the envelope (otherwise it will be "created" in the Draft folder
     envDef.status = 'created';
 
-    const getEnvelopeCallback = function (error, envelope, _response) {
+    var getEnvelopeCallback = function (error, envelope, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -101,7 +101,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
       done();
     };
 
-    const createEnvelopeCallback = function (error, envelopeSummary, _response) {
+    var createEnvelopeCallback = function (error, envelopeSummary, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -120,7 +120,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('listRecipients returns correct recipients of an envelope by envelope id', (done) => {
-    const listRecipientsCallback = function (error, recipients, _response) {
+    var listRecipientsCallback = function (error, recipients, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -149,7 +149,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('createSenderView creates a sender view for the envelope and returns correct url', (done) => {
-    let fileBytes = null;
+    var fileBytes = null;
     try {
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SING_TEST1_FILE));
@@ -159,35 +159,35 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
     }
 
     // create an envelope to be signed
-    const envDef = new docusign.EnvelopeDefinition();
+    var envDef = new docusign.EnvelopeDefinition();
     envDef.emailSubject = 'Please Sign my Node SDK Envelope';
     envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
     // add a document to the envelope
-    const doc = new docusign.Document();
-    const base64Doc = Buffer.from(fileBytes).toString('base64');
+    var doc = new docusign.Document();
+    var base64Doc = Buffer.from(fileBytes).toString('base64');
     doc.documentBase64 = base64Doc;
     doc.name = 'TestFile.pdf';
     doc.documentId = '1';
 
-    const docs = [];
+    var docs = [];
     docs.push(doc);
     envDef.documents = docs;
 
     // Add a recipient to sign the document
-    const signer = new docusign.Signer();
+    var signer = new docusign.Signer();
     signer.email = EMAIL;
-    const name = 'Pat Developer';
+    var name = 'Pat Developer';
     signer.name = name;
     signer.recipientId = '1';
 
     // this value represents the client's unique identifier for the signer
-    const clientUserId = '2939';
+    var clientUserId = '2939';
     signer.clientUserId = clientUserId;
 
     // create a signHere tab somewhere on the document for the signer to sign
     // default unit of measurement is pixels, can be mms, cms, inches also
-    const signHere = new docusign.SignHere();
+    var signHere = new docusign.SignHere();
     signHere.documentId = '1';
     signHere.pageNumber = '1';
     signHere.recipientId = '1';
@@ -195,9 +195,9 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
     signHere.yPosition = '100';
 
     // can have multiple tabs, so need to add to envelope as a single element list
-    const signHereTabs = [];
+    var signHereTabs = [];
     signHereTabs.push(signHere);
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.signHereTabs = signHereTabs;
     signer.tabs = tabs;
 
@@ -209,7 +209,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
     // make the envelope with "created" (draft) status
     envDef.status = 'created';
 
-    const createSenderViewCallback = function (error, viewUrl, _response) {
+    var createSenderViewCallback = function (error, viewUrl, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -220,15 +220,15 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
       done();
     };
 
-    const createEnvelopeCallback = function (error, envelopeSummary, _response) {
+    var createEnvelopeCallback = function (error, envelopeSummary, _response) {
       if (error) {
         console.error(error);
         return done(error);
       }
 
       assert.notStrictEqual(envelopeSummary, undefined);
-      const returnUrl = 'http://www.docusign.com/developer-center';
-      const returnUrlRequest = new docusign.ReturnUrlRequest();
+      var returnUrl = 'http://www.docusign.com/developer-center';
+      var returnUrlRequest = new docusign.ReturnUrlRequest();
       returnUrlRequest.returnUrl = returnUrl;
 
       assert.notStrictEqual(envelopeSummary, undefined);
@@ -242,18 +242,18 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('updateRecipients adds reciipients to the envelope if recipients option is provided with recipients data', (done) => {
-    const newSigner = new docusign.Signer();
+    var newSigner = new docusign.Signer();
     newSigner.email = EMAIL;
     newSigner.name = 'Signer2';
     newSigner.recipientId = '2';
 
     // this value represents the client's unique identifier for the signer
-    const clientUserId = '2939';
+    var clientUserId = '2939';
     newSigner.clientUserId = clientUserId;
 
     // create a signHere tab somewhere on the document for the signer to sign
     // default unit of measurement is pixels, can be mms, cms, inches also
-    const signHere = new docusign.SignHere();
+    var signHere = new docusign.SignHere();
     signHere.documentId = '1';
     signHere.pageNumber = '1';
     signHere.recipientId = '1';
@@ -261,17 +261,17 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
     signHere.yPosition = '100';
 
     // can have multiple tabs, so need to add to envelope as a single element list
-    const signHereTabs = [];
+    var signHereTabs = [];
     signHereTabs.push(signHere);
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.signHereTabs = signHereTabs;
     newSigner.tabs = tabs;
 
-    const newRecipients = new docusign.Recipients();
+    var newRecipients = new docusign.Recipients();
     newRecipients.signers = [];
     newRecipients.signers.push(newSigner);
 
-    const listRecipientsCallback = function (error, recipients, _response) {
+    var listRecipientsCallback = function (error, recipients, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -281,7 +281,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
       done();
     };
 
-    const updateRecipientsCallback = function (error, recipientsUpdateSummary, _response) {
+    var updateRecipientsCallback = function (error, recipientsUpdateSummary, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -297,7 +297,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('listAuditEvents returns the correct envelope audit events for an envelope', (done) => {
-    const listAuditEventsCallback = function (error, envelopeAuditEventResponse, _response) {
+    var listAuditEventsCallback = function (error, envelopeAuditEventResponse, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -313,7 +313,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('updateDocuments adds documents to the envelope if envelopeDefinition option is provided with new envelope definition data', (done) => {
-    let newFileBytes = null;
+    var newFileBytes = null;
     try {
       // read file from a local directory
       newFileBytes = fs.readFileSync(path.resolve(__dirname, SING_TEST2_FILE));
@@ -322,22 +322,22 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
       console.log(`Exception: ${ex}`);
     }
 
-    const newEnvDef = new docusign.EnvelopeDefinition();
+    var newEnvDef = new docusign.EnvelopeDefinition();
 
     // add a document to the envelope
-    const newDoc = new docusign.Document();
-    const base64Doc2 = Buffer.from(newFileBytes).toString('base64');
+    var newDoc = new docusign.Document();
+    var base64Doc2 = Buffer.from(newFileBytes).toString('base64');
     newDoc.documentBase64 = base64Doc2;
     newDoc.name = 'TestFile.docx';
     newDoc.documentId = '2';
 
-    const newDocs = [];
+    var newDocs = [];
     newDocs.push(newDoc);
     newEnvDef.documents = newDocs;
 
-    let oldDocumentsCount = 0;
+    var oldDocumentsCount = 0;
 
-    const secondListDocumentsCallback = function (error, documents, _response) {
+    var secondListDocumentsCallback = function (error, documents, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -351,7 +351,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
       done();
     };
 
-    const updateDocumentsCallback = function (error, envelopeDocumentsResult, _response) {
+    var updateDocumentsCallback = function (error, envelopeDocumentsResult, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -362,7 +362,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
       envelopesApi.listDocuments(ACCOUNT_ID, ENVELOPE_ID, secondListDocumentsCallback);
     };
 
-    const firstListDocumentsCallback = function (error, oldDocuments, _response) {
+    var firstListDocumentsCallback = function (error, oldDocuments, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -379,7 +379,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('listTabs returns the correct recipient tabs of the envelope by recipient id', (done) => {
-    const listTabsCallback = function (error, tabs, _response) {
+    var listTabsCallback = function (error, tabs, _response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -392,7 +392,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
       done();
     };
 
-    const listRecipientsCallback = function (err, recipients, _response) {
+    var listRecipientsCallback = function (err, recipients, _response) {
       if (err) {
         console.error(err);
         return done(err);
@@ -409,7 +409,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('GET Template Recipients', (done) => {
-    const callback = function (error, data, __response) {
+    var callback = function (error, data, __response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -422,7 +422,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('createTabs creates recipient tabs and adds them to the envelope recipient if tabs option is provided with tabs data', (done) => {
-    const signHere = docusign.SignHere.constructFromObject({
+    var signHere = docusign.SignHere.constructFromObject({
       documentId: '1',
       pageNumber: '1',
       recipientId: '1',
@@ -430,12 +430,12 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
       yPosition: '200'
     });
 
-    const signHereTabs = [];
+    var signHereTabs = [];
     signHereTabs.push(signHere);
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.signHereTabs = signHereTabs;
 
-    const callback = function (error, data, __response) {
+    var callback = function (error, data, __response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -455,7 +455,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('updateTabs adds recipient tabs to the envelope recipient if tabs option is provided with tabs data', (done) => {
-    const signHere = docusign.SignHere.constructFromObject({
+    var signHere = docusign.SignHere.constructFromObject({
       documentId: '1',
       pageNumber: '1',
       recipientId: '1',
@@ -463,12 +463,12 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
       yPosition: '200'
     });
 
-    const signHereTabs = [];
+    var signHereTabs = [];
     signHereTabs.push(signHere);
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.signHereTabs = signHereTabs;
 
-    const callback = function (error, data, __response) {
+    var callback = function (error, data, __response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -484,8 +484,8 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('deleteRecipient deletes a recipient from the envelope by recipient id', (done) => {
-    const recipientId = '2';
-    const callback = function (error, data, __response) {
+    var recipientId = '2';
+    var callback = function (error, data, __response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -500,16 +500,16 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('deleteRecipients deletes the recipients from the envelope if recipient option is provided with recipients data', (done) => {
-    const signer = new docusign.Signer();
+    var signer = new docusign.Signer();
     signer.email = 'another2@email.com';
     signer.name = 'Pat Admin';
     signer.recipientId = '3';
 
-    const recipients = new docusign.Recipients();
+    var recipients = new docusign.Recipients();
     recipients.signers = [];
     recipients.signers.push(signer);
 
-    const callback = function (error, data, __response) {
+    var callback = function (error, data, __response) {
       if (error) {
         console.error(error);
         return done(error);
@@ -525,17 +525,17 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('listStatus returns the envelope status for the specified envelopes if the envelopeIdsRequest, envelopeIds and transactionIds options are provided', (done) => {
-    const callback = function (error, envelope, __response) {
+    var callback = function (error, envelope, __response) {
       if (error) {
         console.error(error);
         return done(error);
       }
       assert.notStrictEqual(envelope, undefined);
 
-      const envelopeIds = [ENVELOPE_ID];
-      const transactionIds = [envelope.transactionId];
+      var envelopeIds = [ENVELOPE_ID];
+      var transactionIds = [envelope.transactionId];
 
-      const envelopeIdsRequest = new docusign.EnvelopeIdsRequest();
+      var envelopeIdsRequest = new docusign.EnvelopeIdsRequest();
       envelopeIdsRequest.envelopeIds = envelopeIds;
       envelopeIdsRequest.transactionIds = transactionIds;
 
@@ -556,7 +556,7 @@ describe('EnvelopesApi Tests With Callbacks:', () => {
   });
 
   it('listCustomFields returns the custom field information for the specified envelope', (done) => {
-    const callback = function (error, data, __response) {
+    var callback = function (error, data, __response) {
       if (error) {
         console.error(error);
         return done(error);

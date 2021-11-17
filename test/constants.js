@@ -1,8 +1,8 @@
-const docusign = require('../src/index');
+var docusign = require('../src/index');
 
-const oAuth = docusign.ApiClient.OAuth;
-const restApi = docusign.ApiClient.RestApi;
-let config;
+var oAuth = docusign.ApiClient.OAuth;
+var restApi = docusign.ApiClient.RestApi;
+var config;
 
 try {
   config = require('../test-config');
@@ -11,29 +11,29 @@ try {
   console.error(err);
 }
 
-const EMAIL = config.email;
-const INTEGRATOR_KEY = config.integratorKey;
-const INTEGRATOR_KEY_AUTH_CODE = config.integratorKeyAuthCode;
-const INTEGRATOR_KEY_IMPLICIT = config.integratorKeyImplicit;
-const CLIENT_SECRET = config.clientSecret;
-const TEMPLATE_ID = config.templateId;
+var EMAIL = config.email;
+var INTEGRATOR_KEY = config.integratorKey;
+var INTEGRATOR_KEY_AUTH_CODE = config.integratorKeyAuthCode;
+var INTEGRATOR_KEY_IMPLICIT = config.integratorKeyImplicit;
+var CLIENT_SECRET = config.clientSecret;
+var TEMPLATE_ID = config.templateId;
 
 // for production environment update to "www.docusign.net/restapi"
-const BASE_PATH = restApi.BasePath.DEMO;
-const OAUTH_BASE_PATH = oAuth.BasePath.DEMO;
+var BASE_PATH = restApi.BasePath.DEMO;
+var OAUTH_BASE_PATH = oAuth.BasePath.DEMO;
 
-const SING_TEST1_FILE = 'docs/SignTest1.pdf';
-const SING_TEST2_FILE = 'docs/SignTest1.docx';
-const LARGE_TEST_DOCUMENT1 = 'docs/LargeTestDocument1.pdf';
-const BRAND_LOGO_PATH = 'img/docusign-lgo.png';
-const BRAND_XML_PATH = 'docs/brand.xml';
-const USER_ID = config.userId;
-const REDIRECT_URI = 'https://www.docusign.com/api';
-const PRIVATE_KEY_FILENAME = 'keys/docusign_private_key.txt';
-const EXPIRES_IN = 3600;
+var SING_TEST1_FILE = 'docs/SignTest1.pdf';
+var SING_TEST2_FILE = 'docs/SignTest1.docx';
+var LARGE_TEST_DOCUMENT1 = 'docs/LargeTestDocument1.pdf';
+var BRAND_LOGO_PATH = 'img/docusign-lgo.png';
+var BRAND_XML_PATH = 'docs/brand.xml';
+var USER_ID = config.userId;
+var REDIRECT_URI = 'https://www.docusign.com/api';
+var PRIVATE_KEY_FILENAME = 'keys/docusign_private_key.txt';
+var EXPIRES_IN = 3600;
 
 function getSignerTabsDefinition () {
-  const signHere = docusign.SignHere.constructFromObject({
+  var signHere = docusign.SignHere.constructFromObject({
     documentId: '1',
     pageNumber: '1',
     recipientId: '1',
@@ -41,19 +41,19 @@ function getSignerTabsDefinition () {
     yPosition: '100'
   });
 
-  const signHereTabs = [];
+  var signHereTabs = [];
   signHereTabs.push(signHere);
-  const tabs = new docusign.Tabs();
+  var tabs = new docusign.Tabs();
   tabs.signHereTabs = signHereTabs;
 
   return tabs;
 }
 
-const apiClient = new docusign.ApiClient({
+var apiClient = new docusign.ApiClient({
   basePath: BASE_PATH,
   oAuthBasePath: OAUTH_BASE_PATH
 });
-const scopes = [
+var scopes = [
   oAuth.Scope.IMPERSONATION,
   oAuth.Scope.SIGNATURE
 ];

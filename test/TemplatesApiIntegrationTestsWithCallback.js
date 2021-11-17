@@ -1,9 +1,9 @@
-const docusign = require('../src/index');
-const assert = require('assert');
-const { JWTAuth } = require('./helpers');
-const { apiClient } = require('./constants');
+var docusign = require('../src/index');
+var assert = require('assert');
+var { JWTAuth } = require('./helpers');
+var { apiClient } = require('./constants');
 
-let ACCOUNT_ID = '';
+var ACCOUNT_ID = '';
 
 describe('TemplatesApi Tests With Callbacks:', () => {
   before((done) => {
@@ -19,9 +19,9 @@ describe('TemplatesApi Tests With Callbacks:', () => {
   });
 
   it('listTemplates returns the list of templates for the specified account', (done) => {
-    const templatesApi = new docusign.TemplatesApi(apiClient);
+    var templatesApi = new docusign.TemplatesApi(apiClient);
 
-    const listTemplatesCallback = function (error, templateResults, _response) {
+    var listTemplatesCallback = function (error, templateResults, _response) {
       if (error) {
         console.error(error);
         return done(error);

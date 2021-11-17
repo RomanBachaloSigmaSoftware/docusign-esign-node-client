@@ -1,7 +1,7 @@
-const docusign = require('../src/index');
-const assert = require('assert');
-const { JWTAuth } = require('./helpers');
-const { apiClient } = require('./constants');
+var docusign = require('../src/index');
+var assert = require('assert');
+var { JWTAuth } = require('./helpers');
+var { apiClient } = require('./constants');
 
 describe('DiagnosticsApi Tests With Callbacks:', () => {
   before((done) => {
@@ -16,9 +16,9 @@ describe('DiagnosticsApi Tests With Callbacks:', () => {
   });
 
   it('getRequestLogSettings returns the correct request logging setting', (done) => {
-    const diagnosticsApi = new docusign.DiagnosticsApi(apiClient);
+    var diagnosticsApi = new docusign.DiagnosticsApi(apiClient);
 
-    const callback = function (error, data, __response) {
+    var callback = function (error, data, __response) {
       if (error) {
         console.error(error);
         return done(error);

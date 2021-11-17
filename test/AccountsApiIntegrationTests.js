@@ -1,9 +1,9 @@
-const docusign = require('../src/index');
-const assert = require('assert');
-const { JWTAuth } = require('./helpers');
-const { apiClient } = require('./constants');
+var docusign = require('../src/index');
+var assert = require('assert');
+var { JWTAuth } = require('./helpers');
+var { apiClient } = require('./constants');
 
-let ACCOUNT_ID = '';
+var ACCOUNT_ID = '';
 
 describe('AccountsApi tests:', () => {
   before((done) => {
@@ -19,7 +19,7 @@ describe('AccountsApi tests:', () => {
   });
 
   it('getAccountInformation returns correct account and account settings when includeAccountSettings set to true', (done) => {
-    const accountsApi = new docusign.AccountsApi(apiClient);
+    var accountsApi = new docusign.AccountsApi(apiClient);
     accountsApi.getAccountInformation(ACCOUNT_ID, { includeAccountSettings: true })
       .then((accountInfo) => {
         assert.notStrictEqual(accountInfo, undefined);

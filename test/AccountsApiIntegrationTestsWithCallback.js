@@ -1,9 +1,9 @@
-const docusign = require('../src/index');
-const assert = require('assert');
-const { JWTAuth } = require('./helpers');
-const { apiClient } = require('./constants');
+var docusign = require('../src/index');
+var assert = require('assert');
+var { JWTAuth } = require('./helpers');
+var { apiClient } = require('./constants');
 
-let ACCOUNT_ID = '';
+var ACCOUNT_ID = '';
 
 describe('AccountsApi Tests With Callbacks:', () => {
   before((done) => {
@@ -19,9 +19,9 @@ describe('AccountsApi Tests With Callbacks:', () => {
   });
 
   it('getAccountInformation returns correct account and account settings when includeAccountSettings set to true', (done) => {
-    const accountsApi = new docusign.AccountsApi(apiClient);
+    var accountsApi = new docusign.AccountsApi(apiClient);
 
-    const getAccountInformationCallback = function (error, accountInfo, _response) {
+    var getAccountInformationCallback = function (error, accountInfo, _response) {
       if (error) {
         console.error(error);
         return done(error);

@@ -1,15 +1,15 @@
-const docusign = require('../src/index');
+var docusign = require('../src/index');
 
-const restApi = docusign.ApiClient.RestApi;
+var restApi = docusign.ApiClient.RestApi;
 
-const assert = require('assert');
-const path = require('path');
-const superagent = require('superagent');
+var assert = require('assert');
+var path = require('path');
+var superagent = require('superagent');
 
-const Buffer = global.Buffer.from ? global.Buffer : require('safe-buffer').Buffer;
-const fs = require('fs');
+var Buffer = global.Buffer.from ? global.Buffer : require('safe-buffer').Buffer;
+var fs = require('fs');
 
-const {
+var {
   EMAIL,
   INTEGRATOR_KEY,
   INTEGRATOR_KEY_AUTH_CODE,
@@ -26,10 +26,10 @@ const {
   apiClient,
   scopes
 } = require('./constants');
-const { JWTAuth } = require('./helpers');
+var { JWTAuth } = require('./helpers');
 
-let ACCOUNT_ID = '';
-let ENVELOPE_ID = '';
+var ACCOUNT_ID = '';
+var ENVELOPE_ID = '';
 
 describe('SDK Unit Tests:', () => {
   before((done) => {
@@ -45,7 +45,7 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('oAuthBasePAth should update whenever BasePath does and match the environment', (done) => {
-    const apiClient = new docusign.ApiClient({
+    var apiClient = new docusign.ApiClient({
       basePath: restApi.BasePath.DEMO
     });
     assert.equal(apiClient.oAuthBasePath, apiClient.OAuth.BasePath.DEMO);
@@ -68,8 +68,8 @@ describe('SDK Unit Tests:', () => {
    *
    */
   it('should be able to request a JWT user token', (done) => {
-    const fs = require('fs');
-    const privateKeyFile = fs.readFileSync(path.resolve(__dirname, PRIVATE_KEY_FILENAME));
+    var fs = require('fs');
+    var privateKeyFile = fs.readFileSync(path.resolve(__dirname, PRIVATE_KEY_FILENAME));
     apiClient.requestJWTUserToken(INTEGRATOR_KEY, USER_ID, scopes, privateKeyFile, EXPIRES_IN)
       .then((response) => {
         assert.ok(response.body.access_token);
@@ -84,8 +84,8 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('should be able to request a JWT application token', (done) => {
-    const fs = require('fs');
-    const privateKeyFile = fs.readFileSync(path.resolve(__dirname, PRIVATE_KEY_FILENAME));
+    var fs = require('fs');
+    var privateKeyFile = fs.readFileSync(path.resolve(__dirname, PRIVATE_KEY_FILENAME));
 
     apiClient.requestJWTApplicationToken(INTEGRATOR_KEY, scopes, privateKeyFile, EXPIRES_IN)
       .then((response) => {
@@ -101,12 +101,12 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('should return a properly formatted authorization uri', (done) => {
-    const responseType = apiClient.OAuth.ResponseType.CODE;
-    const scopes = [apiClient.OAuth.Scope.EXTENDED];
-    const randomState = '*^.$DGj*)+}Jk';
-    const formattedScopes = scopes.join(encodeURI(' '));
-    let authUri;
-    let correctAuthUri;
+    var responseType = apiClient.OAuth.ResponseType.CODE;
+    var scopes = [apiClient.OAuth.Scope.EXTENDED];
+    var randomState = '*^.$DGj*)+}Jk';
+    var formattedScopes = scopes.join(encodeURI(' '));
+    var authUri;
+    var correctAuthUri;
     authUri = apiClient.getAuthorizationUri(INTEGRATOR_KEY_AUTH_CODE, scopes, REDIRECT_URI, responseType, randomState);
     correctAuthUri = `https://${
       OAUTH_BASE_PATH
@@ -122,10 +122,10 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('should return an authorization uri to a valid page', (done) => {
-    const responseType = apiClient.OAuth.ResponseType.CODE;
-    const scopes = [apiClient.OAuth.Scope.EXTENDED];
-    const randomState = '*^.$DGj*)+}Jk';
-    const authUri = apiClient.getAuthorizationUri(INTEGRATOR_KEY_AUTH_CODE, scopes, REDIRECT_URI, responseType, randomState);
+    var responseType = apiClient.OAuth.ResponseType.CODE;
+    var scopes = [apiClient.OAuth.Scope.EXTENDED];
+    var randomState = '*^.$DGj*)+}Jk';
+    var authUri = apiClient.getAuthorizationUri(INTEGRATOR_KEY_AUTH_CODE, scopes, REDIRECT_URI, responseType, randomState);
 
     superagent.get(authUri)
       .end((err, res) => {
@@ -142,9 +142,9 @@ describe('SDK Unit Tests:', () => {
    */
 
   it('requestASignature', (done) => {
-    let fileBytes = null;
+    var fileBytes = null;
     try {
-      const fs = require('fs');
+      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SING_TEST1_FILE));
     } catch (ex) {
@@ -153,30 +153,30 @@ describe('SDK Unit Tests:', () => {
     }
 
     // create an envelope to be signed
-    const envDef = new docusign.EnvelopeDefinition();
+    var envDef = new docusign.EnvelopeDefinition();
     envDef.emailSubject = 'Please Sign my Node SDK Envelope';
     envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
     // add a document to the envelope
-    const doc = new docusign.Document();
-    const base64Doc = Buffer.from(fileBytes).toString('base64');
+    var doc = new docusign.Document();
+    var base64Doc = Buffer.from(fileBytes).toString('base64');
     doc.documentBase64 = base64Doc;
     doc.name = 'TestFile.pdf';
     doc.documentId = '1';
 
-    const docs = [];
+    var docs = [];
     docs.push(doc);
     envDef.documents = docs;
 
     // Add a recipient to sign the document
-    const signer = new docusign.Signer();
+    var signer = new docusign.Signer();
     signer.email = EMAIL;
     signer.name = 'Pat Developer';
     signer.recipientId = '1';
 
     // create a signHere tab somewhere on the document for the signer to sign
     // default unit of measurement is pixels, can be mms, cms, inches also
-    const signHere = new docusign.SignHere();
+    var signHere = new docusign.SignHere();
     signHere.documentId = '1';
     signHere.pageNumber = '1';
     signHere.recipientId = '1';
@@ -184,9 +184,9 @@ describe('SDK Unit Tests:', () => {
     signHere.yPosition = '100';
 
     // can have multiple tabs, so need to add to envelope as a single element list
-    const signHereTabs = [];
+    var signHereTabs = [];
     signHereTabs.push(signHere);
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.signHereTabs = signHereTabs;
     signer.tabs = tabs;
 
@@ -198,7 +198,7 @@ describe('SDK Unit Tests:', () => {
     // send the envelope (otherwise it will be "created" in the Draft folder
     envDef.status = 'sent';
 
-    const envelopesApi = new docusign.EnvelopesApi(apiClient);
+    var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
     envelopesApi.createEnvelope(ACCOUNT_ID, { envelopeDefinition: envDef })
       .then((envelopeSummary) => {
@@ -219,10 +219,10 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('requestSignatureFromTemplate', (done) => {
-    const templateRoleName = 'Needs to sign';
+    var templateRoleName = 'Needs to sign';
 
     // create an envelope to be signed
-    const envDef = new docusign.EnvelopeDefinition();
+    var envDef = new docusign.EnvelopeDefinition();
     envDef.emailSubject = 'Please Sign my Node SDK Envelope';
     envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
@@ -230,13 +230,13 @@ describe('SDK Unit Tests:', () => {
     envDef.templateId = TEMPLATE_ID;
 
     // create a template role with a valid templateId and roleName and assign signer info
-    const tRole = new docusign.TemplateRole();
+    var tRole = new docusign.TemplateRole();
     tRole.roleName = templateRoleName;
     tRole.name = 'Pat Developer';
     tRole.email = EMAIL;
 
     // create a list of template roles and add our newly created role
-    const templateRolesList = [];
+    var templateRolesList = [];
     templateRolesList.push(tRole);
 
     // assign template role(s) to the envelope
@@ -245,7 +245,7 @@ describe('SDK Unit Tests:', () => {
     // send the envelope by setting |status| to "sent". To save as a draft set to "created"
     envDef.status = 'sent';
 
-    const envelopesApi = new docusign.EnvelopesApi(apiClient);
+    var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
     envelopesApi.createEnvelope(ACCOUNT_ID, { envelopeDefinition: envDef })
       .then((envelopeSummary) => {
@@ -261,9 +261,9 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('embeddedSigning', (done) => {
-    let fileBytes = null;
+    var fileBytes = null;
     try {
-      const fs = require('fs');
+      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SING_TEST1_FILE));
     } catch (ex) {
@@ -272,35 +272,35 @@ describe('SDK Unit Tests:', () => {
     }
 
     // create an envelope to be signed
-    const envDef = new docusign.EnvelopeDefinition();
+    var envDef = new docusign.EnvelopeDefinition();
     envDef.emailSubject = 'Please Sign my Node SDK Envelope';
     envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
     // add a document to the envelope
-    const doc = new docusign.Document();
-    const base64Doc = Buffer.from(fileBytes).toString('base64');
+    var doc = new docusign.Document();
+    var base64Doc = Buffer.from(fileBytes).toString('base64');
     doc.documentBase64 = base64Doc;
     doc.name = 'TestFile.pdf';
     doc.documentId = '1';
 
-    const docs = [];
+    var docs = [];
     docs.push(doc);
     envDef.documents = docs;
 
     // Add a recipient to sign the document
-    const signer = new docusign.Signer();
+    var signer = new docusign.Signer();
     signer.email = EMAIL;
-    const name = 'Pat Developer';
+    var name = 'Pat Developer';
     signer.name = name;
     signer.recipientId = '1';
 
     // this value represents the client's unique identifier for the signer
-    const clientUserId = '2939';
+    var clientUserId = '2939';
     signer.clientUserId = clientUserId;
 
     // create a signHere tab somewhere on the document for the signer to sign
     // default unit of measurement is pixels, can be mms, cms, inches also
-    const signHere = new docusign.SignHere();
+    var signHere = new docusign.SignHere();
     signHere.documentId = '1';
     signHere.pageNumber = '1';
     signHere.recipientId = '1';
@@ -308,9 +308,9 @@ describe('SDK Unit Tests:', () => {
     signHere.yPosition = '100';
 
     // can have multiple tabs, so need to add to envelope as a single element list
-    const signHereTabs = [];
+    var signHereTabs = [];
     signHereTabs.push(signHere);
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.signHereTabs = signHereTabs;
     signer.tabs = tabs;
 
@@ -322,13 +322,13 @@ describe('SDK Unit Tests:', () => {
     // send the envelope (otherwise it will be "created" in the Draft folder
     envDef.status = 'sent';
 
-    const envelopesApi = new docusign.EnvelopesApi(apiClient);
+    var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
     envelopesApi.createEnvelope(ACCOUNT_ID, { envelopeDefinition: envDef })
       .then((envelopeSummary) => {
         if (envelopeSummary) {
-          const returnUrl = 'http://www.docusign.com/developer-center';
-          const recipientView = new docusign.RecipientViewRequest();
+          var returnUrl = 'http://www.docusign.com/developer-center';
+          var recipientView = new docusign.RecipientViewRequest();
           recipientView.returnUrl = returnUrl;
           recipientView.clientUserId = clientUserId;
           recipientView.authenticationMethod = 'email';
@@ -358,9 +358,9 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('createTemplate', (done) => {
-    let fileBytes = null;
+    var fileBytes = null;
     try {
-      const fs = require('fs');
+      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SING_TEST1_FILE));
     } catch (ex) {
@@ -369,28 +369,28 @@ describe('SDK Unit Tests:', () => {
     }
 
     // create an envelope to be signed
-    const template = new docusign.EnvelopeTemplate();
+    var template = new docusign.EnvelopeTemplate();
     template.emailSubject = 'Please Sign my Node SDK Envelope';
     template.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
     // add a document to the envelope
-    const doc = new docusign.Document();
-    const base64Doc = Buffer.from(fileBytes).toString('base64');
+    var doc = new docusign.Document();
+    var base64Doc = Buffer.from(fileBytes).toString('base64');
     doc.documentBase64 = base64Doc;
     doc.name = 'TestFile.pdf';
     doc.documentId = '1';
 
-    const docs = [];
+    var docs = [];
     docs.push(doc);
     template.documents = docs;
 
     // Add a recipient to sign the document
-    const signer = new docusign.Signer();
+    var signer = new docusign.Signer();
     signer.roleName = 'Signer1';
     signer.recipientId = '1';
 
     // Create a SignHere tab somewhere on the document for the signer to sign
-    const signHere = new docusign.SignHere();
+    var signHere = new docusign.SignHere();
     signHere.documentId = '1';
     signHere.pageNumber = '1';
     signHere.recipientId = '1';
@@ -398,9 +398,9 @@ describe('SDK Unit Tests:', () => {
     signHere.yPosition = '100';
 
     // can have multiple tabs, so need to add to envelope as a single element list
-    const signHereTabs = [];
+    var signHereTabs = [];
     signHereTabs.push(signHere);
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.signHereTabs = signHereTabs;
     signer.tabs = tabs;
 
@@ -409,11 +409,11 @@ describe('SDK Unit Tests:', () => {
     template.recipients.signers = [];
     template.recipients.signers.push(signer);
 
-    const envTemplate = new docusign.EnvelopeTemplate();
+    var envTemplate = new docusign.EnvelopeTemplate();
     envTemplate.name = 'myTemplate';
     template.envelopeTemplate = envTemplate;
 
-    const templatesApi = new docusign.TemplatesApi(apiClient);
+    var templatesApi = new docusign.TemplatesApi(apiClient);
 
     templatesApi.createTemplate(ACCOUNT_ID, { envelopeTemplate: template })
       .then((templateSummary) => {
@@ -430,9 +430,9 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('downLoadEnvelopeDocuments', (done) => {
-    let fileBytes = null;
+    var fileBytes = null;
     try {
-      const fs = require('fs');
+      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, LARGE_TEST_DOCUMENT1));
     } catch (ex) {
@@ -441,35 +441,35 @@ describe('SDK Unit Tests:', () => {
     }
 
     // create an envelope to be signed
-    const envDef = new docusign.EnvelopeDefinition();
+    var envDef = new docusign.EnvelopeDefinition();
     envDef.emailSubject = 'Please Sign my Node SDK Envelope';
     envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
     // add a document to the envelope
-    const doc = new docusign.Document();
-    const base64Doc = Buffer.from(fileBytes).toString('base64');
+    var doc = new docusign.Document();
+    var base64Doc = Buffer.from(fileBytes).toString('base64');
     doc.documentBase64 = base64Doc;
     doc.name = 'TestFile.pdf';
     doc.documentId = '1';
 
-    const docs = [];
+    var docs = [];
     docs.push(doc);
     envDef.documents = docs;
 
     // Add a recipient to sign the document
-    const signer = new docusign.Signer();
+    var signer = new docusign.Signer();
     signer.email = EMAIL;
-    const name = 'Pat Developer';
+    var name = 'Pat Developer';
     signer.name = name;
     signer.recipientId = '1';
 
     // this value represents the client's unique identifier for the signer
-    const clientUserId = '2939';
+    var clientUserId = '2939';
     signer.clientUserId = clientUserId;
 
     // create a signHere tab somewhere on the document for the signer to sign
     // default unit of measurement is pixels, can be mms, cms, inches also
-    const signHere = new docusign.SignHere();
+    var signHere = new docusign.SignHere();
     signHere.documentId = '1';
     signHere.pageNumber = '1';
     signHere.recipientId = '1';
@@ -477,9 +477,9 @@ describe('SDK Unit Tests:', () => {
     signHere.yPosition = '100';
 
     // can have multiple tabs, so need to add to envelope as a single element list
-    const signHereTabs = [];
+    var signHereTabs = [];
     signHereTabs.push(signHere);
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.signHereTabs = signHereTabs;
     signer.tabs = tabs;
 
@@ -491,7 +491,7 @@ describe('SDK Unit Tests:', () => {
     // send the envelope (otherwise it will be "created" in the Draft folder
     envDef.status = 'sent';
 
-    const envelopesApi = new docusign.EnvelopesApi(apiClient);
+    var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
     envelopesApi.createEnvelope(ACCOUNT_ID, { envelopeDefinition: envDef })
       .then((envelopeSummary) => {
@@ -501,10 +501,10 @@ describe('SDK Unit Tests:', () => {
             .then((pdfBytes) => {
               if (pdfBytes) {
                 try {
-                  const fs = require('fs');
+                  var fs = require('fs');
                   // download the document pdf
-                  const filename = `${ACCOUNT_ID}_${envelopeSummary.envelopeId}_combined.pdf`;
-                  const tempFile = path.resolve(__dirname, filename);
+                  var filename = `${ACCOUNT_ID}_${envelopeSummary.envelopeId}_combined.pdf`;
+                  var tempFile = path.resolve(__dirname, filename);
                   fs.writeFile(tempFile, Buffer.from(pdfBytes, 'binary'), (err) => {
                     if (err) console.log(`Error: ${err}`);
                   });
@@ -531,7 +531,7 @@ describe('SDK Unit Tests:', () => {
       });
   });
   it('listDocuments', (done) => {
-    const envelopesApi = new docusign.EnvelopesApi(apiClient);
+    var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
     envelopesApi.listDocuments(ACCOUNT_ID, ENVELOPE_ID)
       .then((docsList) => {
@@ -563,8 +563,8 @@ describe('SDK Unit Tests:', () => {
       });
   });
   it('listStatusBody', (done) => {
-    const envelopesApi = new docusign.EnvelopesApi(apiClient);
-    const envelopeIdsRequest = new docusign.EnvelopeIdsRequest();
+    var envelopesApi = new docusign.EnvelopesApi(apiClient);
+    var envelopeIdsRequest = new docusign.EnvelopeIdsRequest();
     envelopeIdsRequest.envelopeIds = [ENVELOPE_ID];
     envelopesApi.listStatus(ACCOUNT_ID, { envelopeIdsRequest, envelopeIds: 'request_body' })
       .then((data) => {
@@ -576,7 +576,7 @@ describe('SDK Unit Tests:', () => {
       .catch((error) => done(error));
   });
   it('listStatusQuery', (done) => {
-    const envelopesApi = new docusign.EnvelopesApi(apiClient);
+    var envelopesApi = new docusign.EnvelopesApi(apiClient);
     envelopesApi.listStatusChanges(ACCOUNT_ID, { envelopeIds: ENVELOPE_ID })
       .then((data) => {
         assert.notEqual(data.envelopes, undefined);
@@ -595,15 +595,15 @@ describe('SDK Unit Tests:', () => {
   it('listStatusChangesOptions 70 envelopeIds', (done) => {
     console.log('starwars');
 
-    let envelopesApi = new docusign.EnvelopesApi(apiClient);
-    let THIRTY_DAYS_AGO = new Date(new Date().setDate(new Date().getDate() - 30));
+    var envelopesApi = new docusign.EnvelopesApi(apiClient);
+    var THIRTY_DAYS_AGO = new Date(new Date().setDate(new Date().getDate() - 30));
 
-    let options = {
+    var options = {
       count: '70', fromDate: THIRTY_DAYS_AGO
     };
     envelopesApi.listStatusChanges(ACCOUNT_ID, options)
       .then((data) => {
-        let envelopIds = data.envelopes.reduce((acc, envelope) => {
+        var envelopIds = data.envelopes.reduce((acc, envelope) => {
           if (!acc.length) return envelope.envelopeId;
           return `${acc}, ${envelope.envelopeId}`;
         }, '');
@@ -631,9 +631,9 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('getDiagnosticLogs', (done) => {
-    let fileBytes = null;
+    var fileBytes = null;
     try {
-      const fs = require('fs');
+      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SING_TEST1_FILE));
     } catch (ex) {
@@ -642,35 +642,35 @@ describe('SDK Unit Tests:', () => {
     }
 
     // create an envelope to be signed
-    const envDef = new docusign.EnvelopeDefinition();
+    var envDef = new docusign.EnvelopeDefinition();
     envDef.emailSubject = 'downLoadEnvelopeDocuments';
     envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
     // add a document to the envelope
-    const doc = new docusign.Document();
-    const base64Doc = Buffer.from(fileBytes).toString('base64');
+    var doc = new docusign.Document();
+    var base64Doc = Buffer.from(fileBytes).toString('base64');
     doc.documentBase64 = base64Doc;
     doc.name = 'TestFile.pdf';
     doc.documentId = '1';
 
-    const docs = [];
+    var docs = [];
     docs.push(doc);
     envDef.documents = docs;
 
     // Add a recipient to sign the document
-    const signer = new docusign.Signer();
+    var signer = new docusign.Signer();
     signer.email = EMAIL;
-    const name = 'Pat Developer';
+    var name = 'Pat Developer';
     signer.name = name;
     signer.recipientId = '1';
 
     // this value represents the client's unique identifier for the signer
-    const clientUserId = '2939';
+    var clientUserId = '2939';
     signer.clientUserId = clientUserId;
 
     // create a signHere tab somewhere on the document for the signer to sign
     // default unit of measurement is pixels, can be mms, cms, inches also
-    const signHere = new docusign.SignHere();
+    var signHere = new docusign.SignHere();
     signHere.documentId = '1';
     signHere.pageNumber = '1';
     signHere.recipientId = '1';
@@ -678,9 +678,9 @@ describe('SDK Unit Tests:', () => {
     signHere.yPosition = '100';
 
     // can have multiple tabs, so need to add to envelope as a single element list
-    const signHereTabs = [];
+    var signHereTabs = [];
     signHereTabs.push(signHere);
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.signHereTabs = signHereTabs;
     signer.tabs = tabs;
 
@@ -692,16 +692,16 @@ describe('SDK Unit Tests:', () => {
     // send the envelope (otherwise it will be "created" in the Draft folder
     envDef.status = 'sent';
 
-    const diagApi = new docusign.DiagnosticsApi(apiClient);
+    var diagApi = new docusign.DiagnosticsApi(apiClient);
 
-    const diagSettings = new docusign.DiagnosticsSettingsInformation();
+    var diagSettings = new docusign.DiagnosticsSettingsInformation();
     diagSettings.apiRequestLogging = 'true';
     diagApi.updateRequestLogSettings({ diagnosticsSettingsInformation: diagSettings })
       .then((diagnosticsSettingsInformation) => {
         if (diagnosticsSettingsInformation) {
           console.log(`DiagnosticsSettingsInformation: ${JSON.stringify(diagnosticsSettingsInformation)}`);
 
-          const envelopesApi = new docusign.EnvelopesApi(apiClient);
+          var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
           envelopesApi.createEnvelope(ACCOUNT_ID, { envelopeDefinition: envDef })
             .then((envelopeSummary) => {
@@ -711,10 +711,10 @@ describe('SDK Unit Tests:', () => {
                   .then((pdfBytes) => {
                     if (pdfBytes) {
                       try {
-                        const fs = require('fs');
+                        var fs = require('fs');
                         // download the document pdf
-                        const filename = `${ACCOUNT_ID}_${envelopeSummary.envelopeId}_combined.pdf`;
-                        const tempFile = path.resolve(__dirname, filename);
+                        var filename = `${ACCOUNT_ID}_${envelopeSummary.envelopeId}_combined.pdf`;
+                        var tempFile = path.resolve(__dirname, filename);
                         fs.writeFile(tempFile, Buffer.from(pdfBytes, 'binary'), (err) => {
                           if (err) console.log(`Error: ${err}`);
                         });
@@ -725,16 +725,16 @@ describe('SDK Unit Tests:', () => {
                       diagApi.listRequestLogs()
                         .then((logsList) => {
                           if (logsList) {
-                            const { requestLogId } = logsList.apiRequestLogs[0];
+                            var { requestLogId } = logsList.apiRequestLogs[0];
                             console.log(requestLogId);
                             diagApi.getRequestLog(requestLogId)
                               .then((diagBytes) => {
                                 if (diagBytes) {
                                   try {
-                                    const fs = require('fs');
+                                    var fs = require('fs');
                                     // download the document pdf
-                                    const filename = `${requestLogId}.txt`;
-                                    const tempFile = path.resolve(__dirname, filename);
+                                    var filename = `${requestLogId}.txt`;
+                                    var tempFile = path.resolve(__dirname, filename);
                                     fs.writeFile(tempFile, diagBytes, (err) => {
                                       if (err) console.log(`Error: ${err}`);
                                     });
@@ -787,7 +787,7 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('getTemplate', (done) => {
-    const templatesApi = new docusign.TemplatesApi(apiClient);
+    var templatesApi = new docusign.TemplatesApi(apiClient);
     templatesApi.get(ACCOUNT_ID, TEMPLATE_ID)
       .then((envelopeTemplate) => {
         if (envelopeTemplate) {
@@ -817,11 +817,11 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('update primary account brandlogo', (done) => {
-    const accountsApi = new docusign.AccountsApi(apiClient);
+    var accountsApi = new docusign.AccountsApi(apiClient);
     accountsApi.listBrands(ACCOUNT_ID, { includeLogos: true })
       .then((brandsData) => {
-        const currentBrand = brandsData.brands[0];
-        const newLogoBytes = fs.readFileSync(path.resolve(__dirname, BRAND_LOGO_PATH));
+        var currentBrand = brandsData.brands[0];
+        var newLogoBytes = fs.readFileSync(path.resolve(__dirname, BRAND_LOGO_PATH));
         accountsApi.deleteBrandLogoByType(ACCOUNT_ID, currentBrand.brandId, 'Primary')
           .then(() => {
             accountsApi.updateBrandLogoByType(newLogoBytes, ACCOUNT_ID, currentBrand.brandId, 'Primary')
@@ -843,11 +843,11 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('it updateBrandResourcesByContentType', (done) => {
-    const accountsApi = new docusign.AccountsApi(apiClient);
+    var accountsApi = new docusign.AccountsApi(apiClient);
     accountsApi.listBrands(ACCOUNT_ID, { includeLogos: true })
       .then((brandsData) => {
-        const currentBrand = brandsData.brands[0];
-        const brandXmlBuffer = fs.readFileSync(path.resolve(__dirname, BRAND_XML_PATH));
+        var currentBrand = brandsData.brands[0];
+        var brandXmlBuffer = fs.readFileSync(path.resolve(__dirname, BRAND_XML_PATH));
         accountsApi.updateBrandResourcesByContentType(ACCOUNT_ID, currentBrand.brandId, 'email', brandXmlBuffer)
           .then((data) => {
             assert.notEqual(data.createdByUserInfo, undefined);
@@ -870,9 +870,9 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('create template with date and number tabs', (done) => {
-    let fileBytes = null;
+    var fileBytes = null;
     try {
-      const fs = require('fs');
+      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SING_TEST1_FILE));
     } catch (ex) {
@@ -881,27 +881,27 @@ describe('SDK Unit Tests:', () => {
     }
 
     // create an envelope to be signed
-    const template = new docusign.EnvelopeTemplate();
+    var template = new docusign.EnvelopeTemplate();
     template.emailSubject = 'Please Sign my Node SDK Envelope containing DateTabs and NumberTabs';
     template.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
     // add a document to the envelope
-    const doc = new docusign.Document();
-    const base64Doc = Buffer.from(fileBytes).toString('base64');
+    var doc = new docusign.Document();
+    var base64Doc = Buffer.from(fileBytes).toString('base64');
     doc.documentBase64 = base64Doc;
     doc.name = 'TestFile.pdf';
     doc.documentId = '1';
 
-    const docs = [];
+    var docs = [];
     docs.push(doc);
     template.documents = docs;
 
     // Add a recipient to sign the document
-    const signer = new docusign.Signer();
+    var signer = new docusign.Signer();
     signer.roleName = 'Signer1';
     signer.recipientId = '1';
 
-    const dateTab = new docusign.ModelDate();
+    var dateTab = new docusign.ModelDate();
     dateTab.documentId = '1';
     dateTab.pageNumber = '1';
     dateTab.recipientId = '1';
@@ -910,7 +910,7 @@ describe('SDK Unit Tests:', () => {
     dateTab.xPosition = '241';
     dateTab.yPosition = '445';
 
-    const numberTab = new docusign.ModelNumber();
+    var numberTab = new docusign.ModelNumber();
     numberTab.documentId = '1';
     numberTab.pageNumber = '1';
     numberTab.recipientId = '1';
@@ -919,12 +919,12 @@ describe('SDK Unit Tests:', () => {
     numberTab.xPosition = '271';
     numberTab.yPosition = '383';
     // can have multiple tabs, so need to add to envelope as a single element list
-    const numberTabs = [];
-    const dateTabs = [];
+    var numberTabs = [];
+    var dateTabs = [];
     numberTabs.push(numberTab);
     dateTabs.push(dateTab);
 
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.numberTabs = numberTabs;
     tabs.dateTabs = dateTabs;
     signer.tabs = tabs;
@@ -934,11 +934,11 @@ describe('SDK Unit Tests:', () => {
     template.recipients.signers = [];
     template.recipients.signers.push(signer);
 
-    const envTemplate = new docusign.EnvelopeTemplate();
+    var envTemplate = new docusign.EnvelopeTemplate();
     envTemplate.name = 'myTemplate ModelNumber';
     template.envelopeTemplate = envTemplate;
 
-    const templatesApi = new docusign.TemplatesApi(apiClient);
+    var templatesApi = new docusign.TemplatesApi(apiClient);
 
     templatesApi.createTemplate(ACCOUNT_ID, { envelopeTemplate: template })
       .then((templateSummary) => {
@@ -965,9 +965,9 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('resend envelope with envelope update', (done) => {
-    let fileBytes = null;
+    var fileBytes = null;
     try {
-      const fs = require('fs');
+      var fs = require('fs');
       // read file from a local directory
       fileBytes = fs.readFileSync(path.resolve(__dirname, SING_TEST1_FILE));
     } catch (ex) {
@@ -976,35 +976,35 @@ describe('SDK Unit Tests:', () => {
     }
 
     // create an envelope to be signed
-    const envDef = new docusign.EnvelopeDefinition();
+    var envDef = new docusign.EnvelopeDefinition();
     envDef.emailSubject = 'Please Sign my Node SDK Envelope';
     envDef.emailBlurb = 'Hello, Please sign my Node SDK Envelope.';
 
     // add a document to the envelope
-    const doc = new docusign.Document();
-    const base64Doc = Buffer.from(fileBytes).toString('base64');
+    var doc = new docusign.Document();
+    var base64Doc = Buffer.from(fileBytes).toString('base64');
     doc.documentBase64 = base64Doc;
     doc.name = 'TestFile.pdf';
     doc.documentId = '1';
 
-    const docs = [];
+    var docs = [];
     docs.push(doc);
     envDef.documents = docs;
 
     // Add a recipient to sign the document
-    const signer = new docusign.Signer();
+    var signer = new docusign.Signer();
     signer.email = EMAIL;
-    const name = 'Pat Developer';
+    var name = 'Pat Developer';
     signer.name = name;
     signer.recipientId = '1';
 
     // this value represents the client's unique identifier for the signer
-    const clientUserId = '2939';
+    var clientUserId = '2939';
     signer.clientUserId = clientUserId;
 
     // create a signHere tab somewhere on the document for the signer to sign
     // default unit of measurement is pixels, can be mms, cms, inches also
-    const signHere = new docusign.SignHere();
+    var signHere = new docusign.SignHere();
     signHere.documentId = '1';
     signHere.pageNumber = '1';
     signHere.recipientId = '1';
@@ -1012,9 +1012,9 @@ describe('SDK Unit Tests:', () => {
     signHere.yPosition = '100';
 
     // can have multiple tabs, so need to add to envelope as a single element list
-    const signHereTabs = [];
+    var signHereTabs = [];
     signHereTabs.push(signHere);
-    const tabs = new docusign.Tabs();
+    var tabs = new docusign.Tabs();
     tabs.signHereTabs = signHereTabs;
     signer.tabs = tabs;
 
@@ -1026,7 +1026,7 @@ describe('SDK Unit Tests:', () => {
     // send the envelope (otherwise it will be "created" in the Draft folder
     envDef.status = 'sent';
 
-    const envelopesApi = new docusign.EnvelopesApi(apiClient);
+    var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
     envelopesApi.createEnvelope(ACCOUNT_ID, { envelopeDefinition: envDef })
       .then((envelopeSummary) => {
@@ -1055,10 +1055,10 @@ describe('SDK Unit Tests:', () => {
   });
 
   it('Test Get Form Data', (done) => {
-    const envelopesApi = new docusign.EnvelopesApi(apiClient);
+    var envelopesApi = new docusign.EnvelopesApi(apiClient);
 
     // create an envelope to be signed
-    const envDef = new docusign.EnvelopeDefinition();
+    var envDef = new docusign.EnvelopeDefinition();
     envDef.templateId = TEMPLATE_ID;
 
     envelopesApi.createEnvelope(ACCOUNT_ID, { envelopeDefinition: envDef })
